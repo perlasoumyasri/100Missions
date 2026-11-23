@@ -1,0 +1,8 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
+  "installCommand": "echo \"Each mission installs its own dependencies during the build\"",
+  "buildCommand": "node scripts/build-site.mjs",
+  "outputDirectory": "dist",
+  "trailingSlash": true
+}

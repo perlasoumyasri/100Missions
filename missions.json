@@ -1,0 +1,15 @@
+{
+  "total": 100,
+  "missions": [
+    {
+      "number": 1,
+      "slug": "mission-001",
+      "dir": "mission-001-design-oracle",
+      "title": "The Design Oracle",
+      "tagline": "An 8-bit fortune teller for designers. Wisdom, roasts and creative boosts.",
+      "date": "2026-11-23",
+      "tags": ["React", "Tailwind", "8bitcn", "Pixel art"],
+      "thumbnail": "mission-001-design-oracle/docs/preview.png"
+    }
+  ]
+}

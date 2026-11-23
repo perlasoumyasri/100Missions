@@ -1,0 +1,9 @@
+{
+  "name": "100-missions",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build-site.mjs",
+    "preview": "npx --yes serve dist"
+  }
+}

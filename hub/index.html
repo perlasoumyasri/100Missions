@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>100 Missions</title>
+    <meta name="description" content="100 days, 100 missions. One small product shipped every day, each with its own idea, stack and design system." />
+    <meta name="theme-color" content="#f2efe8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="page">
+      <header class="topbar">
+        <a class="wordmark" href="/" aria-label="100 Missions home">
+          <span class="wordmark-mark" aria-hidden="true"></span>
+          100 MISSIONS
+        </a>
+        <a class="topbar-link" href="https://github.com/perlasoumyasri/100Missions" target="_blank" rel="noopener">
+          Source on GitHub ↗
+        </a>
+      </header>
+
+      <main>
+        <section class="hero">
+          <p class="eyebrow mono" id="day-label">Day 1 / 100</p>
+          <h1>100 days.<br />100 missions.</h1>
+          <p class="lede">
+            One small product shipped every day. Each mission has its own idea, its own stack and its own design
+            system. Missions unlock as they ship.
+          </p>
+          <div class="progress" aria-labelledby="progress-label">
+            <div class="progress-track" id="progress-track" aria-hidden="true"></div>
+            <p class="mono progress-label" id="progress-label">0 of 100 shipped</p>
+          </div>
+        </section>
+
+        <section class="latest" aria-labelledby="latest-heading" id="latest" hidden>
+          <h2 class="section-title mono" id="latest-heading">Latest mission</h2>
+          <a class="feature" id="feature" href="#">
+            <div class="feature-media">
+              <img id="feature-img" alt="" loading="eager" />
+            </div>
+            <div class="feature-body">
+              <p class="mono feature-num" id="feature-num"></p>
+              <h3 id="feature-title"></h3>
+              <p class="feature-tagline" id="feature-tagline"></p>
+              <ul class="tags" id="feature-tags"></ul>
+              <span class="launch">Launch mission <span aria-hidden="true">→</span></span>
+            </div>
+          </a>
+        </section>
+
+        <section aria-labelledby="board-heading">
+          <div class="board-head">
+            <h2 class="section-title mono" id="board-heading">Mission board</h2>
+            <p class="legend mono">
+              <span><i class="dot dot-done"></i>Shipped</span>
+              <span><i class="dot dot-next"></i>Up next</span>
+              <span><i class="dot dot-locked"></i>Locked</span>
+            </p>
+          </div>
+          <ol class="board" id="board"></ol>
+        </section>
+      </main>
+
+      <footer class="footer mono">
+        <span>Built in public, one mission a day.</span>
+        <span id="footer-count"></span>
+      </footer>
+    </div>
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>
