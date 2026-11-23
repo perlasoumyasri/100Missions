@@ -1,0 +1,214 @@
+@import "@fontsource/press-start-2p/400.css";
+@import "@fontsource/vt323/400.css";
+@import "@fontsource/space-grotesk/500.css";
+@import "@fontsource/space-grotesk/600.css";
+@import "tailwindcss";
+
+/* ------------------------------------------------------------------ */
+/* Theme tokens (shadcn-style, consumed by the 8bitcn components)      */
+/* ------------------------------------------------------------------ */
+
+:root {
+  --ink: #0b0918;
+  --background: #151229;
+  --foreground: #fff7e9;
+  --card: #251f40;
+  --card-foreground: #fff7e9;
+  --popover: #251f40;
+  --popover-foreground: #fff7e9;
+  --primary: #c9ff70;
+  --primary-foreground: #151229;
+  --secondary: #bba3ff;
+  --secondary-foreground: #151229;
+  --muted: #2f2852;
+  --muted-foreground: #b9b0d6;
+  --accent: #ff9d86;
+  --accent-foreground: #151229;
+  --destructive: #ff6b6b;
+  --border: #3a3266;
+  --input: #3a3266;
+  --ring: #c9ff70;
+
+  --wisdom: #bba3ff;
+  --roast: #ff9d86;
+  --boost: #c9ff70;
+
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-ink: var(--ink);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-wisdom: var(--wisdom);
+  --color-roast: var(--roast);
+  --color-boost: var(--boost);
+
+  --font-pixel: "Press Start 2P", ui-monospace, monospace;
+  --font-terminal: "VT323", ui-monospace, monospace;
+  --font-body: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+}
+
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+  html {
+    background: var(--background);
+  }
+  body {
+    margin: 0;
+    min-height: 100dvh;
+    background: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+  }
+  ::selection {
+    background: var(--primary);
+    color: var(--ink);
+  }
+  :focus-visible {
+    outline: 3px solid var(--primary);
+    outline-offset: 4px;
+  }
+  /* 8bitcn controls draw pixel borders outside their box, so push the ring past them. */
+  button:focus-visible,
+  [role="radio"]:focus-visible {
+    outline: 3px solid var(--primary) !important;
+    outline-offset: 9px !important;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Atmosphere                                                          */
+/* ------------------------------------------------------------------ */
+
+/* Very faint CRT scanlines over the whole screen. */
+.crt::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 50;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgb(0 0 0 / 0) 0px,
+    rgb(0 0 0 / 0) 2px,
+    rgb(0 0 0 / 0.07) 3px
+  );
+}
+
+/* Dotted pixel floor pattern behind the page. */
+.pixel-dots {
+  background-image: radial-gradient(rgb(187 163 255 / 0.09) 1px, transparent 1.5px);
+  background-size: 16px 16px;
+}
+
+/* Hard, offset pixel shadow that follows stepped corners. */
+.hard-shadow {
+  filter: drop-shadow(6px 6px 0 var(--ink));
+}
+.hard-shadow-sm {
+  filter: drop-shadow(4px 4px 0 var(--ink));
+}
+
+.sprite {
+  image-rendering: pixelated;
+  shape-rendering: crispEdges;
+}
+
+/* ------------------------------------------------------------------ */
+/* Motion                                                              */
+/* ------------------------------------------------------------------ */
+
+@keyframes oracle-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3.5%); }
+}
+@keyframes oracle-blink {
+  0%, 92%, 100% { transform: scaleY(1); }
+  95% { transform: scaleY(0.1); }
+}
+@keyframes ball-shake {
+  0%, 100% { transform: translate(0, 0); }
+  20% { transform: translate(-2px, 0); }
+  40% { transform: translate(2px, -1px); }
+  60% { transform: translate(-2px, 1px); }
+  80% { transform: translate(2px, 0); }
+}
+@keyframes swirl {
+  to { transform: rotate(360deg); }
+}
+@keyframes glow-pulse {
+  0%, 100% { opacity: 0.55; transform: scale(0.92); }
+  50% { opacity: 1; transform: scale(1.05); }
+}
+@keyframes twinkle {
+  0%, 100% { opacity: 0.2; }
+  50% { opacity: 1; }
+}
+@keyframes particle {
+  0% { transform: translate(0, 0) scale(1); opacity: 1; }
+  100% { transform: translate(var(--dx), var(--dy)) scale(0.4); opacity: 0; }
+}
+@keyframes card-in {
+  0% { transform: translateY(14px) scale(0.97); opacity: 0; }
+  60% { opacity: 1; }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+@keyframes caret {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+@keyframes nudge {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(3px); }
+}
+@keyframes toast-in {
+  from { transform: translateY(8px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.anim-float { animation: oracle-float 3.2s ease-in-out infinite; }
+.anim-blink { transform-box: fill-box; transform-origin: center; animation: oracle-blink 4.2s infinite; }
+.anim-shake { animation: ball-shake 0.18s steps(2) infinite; }
+.anim-swirl { transform-box: fill-box; transform-origin: center; animation: swirl 0.7s steps(8) infinite; }
+.anim-glow { animation: glow-pulse 0.5s ease-in-out infinite; }
+.anim-twinkle { animation: twinkle 2.4s steps(3) infinite; }
+.anim-particle { animation: particle 0.75s cubic-bezier(0.2, 0.7, 0.3, 1) forwards; }
+.anim-card-in { animation: card-in 0.36s steps(6) both; }
+.anim-caret { animation: caret 0.9s infinite; }
+.anim-nudge { animation: nudge 1s steps(2) infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .anim-float,
+  .anim-blink,
+  .anim-shake,
+  .anim-swirl,
+  .anim-glow,
+  .anim-twinkle,
+  .anim-particle,
+  .anim-card-in,
+  .anim-caret,
+  .anim-nudge {
+    animation: none !important;
+  }
+  .anim-particle { display: none; }
+}
