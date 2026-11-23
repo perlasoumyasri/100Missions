@@ -12,27 +12,27 @@ export const M_W = 72
 export const M_H = 128
 
 export const PAL = {
-  ink: "#16131f",
-  verm: "#e4643d",
-  vermHi: "#f4875d",
-  vermSh: "#b9472a",
-  vermDeep: "#8a3220",
-  cream: "#f1dda5",
-  creamSh: "#d6bb7d",
-  petrol: "#243a4a",
-  petrolDk: "#172734",
-  petrolHi: "#33536a",
-  mustard: "#f5b947",
-  mustardHi: "#ffd98a",
-  mustardSh: "#c48a2a",
-  jade: "#78b18c",
-  jadeSh: "#4f8665",
-  glass: "#142530",
-  glassHi: "#1b3241",
+  ink: "#06040a",
+  verm: "#a855f7",
+  vermHi: "#d8b4fe",
+  vermSh: "#7e22ce",
+  vermDeep: "#581c87",
+  cream: "#e9d5ff",
+  creamSh: "#c4b5fd",
+  petrol: "#33215a",
+  petrolDk: "#22163d",
+  petrolHi: "#5b21b6",
+  mustard: "#22d3ee",
+  mustardHi: "#a5f3fc",
+  mustardSh: "#0891b2",
+  jade: "#14b8a6",
+  jadeSh: "#0f766e",
+  glass: "#0d0915",
+  glassHi: "#170f26",
   steel: "#a9b4b8",
   steelSh: "#66747b",
-  bulbOff: "#5b4026",
-  white: "#fff8e6",
+  bulbOff: "#3b2350",
+  white: "#faf5ff",
 }
 
 /** Head geometry (octagon with a round window). */
@@ -87,7 +87,7 @@ function buildBody(): Sprite {
   })
   // Glass glint.
   for (const [x, y] of [[24, 17], [23, 18], [22, 19], [22, 20], [25, 16], [26, 15], [21, 22]] as const) {
-    g.set(x, y, "#2d4a5c")
+    g.set(x, y, "#2a1d44")
   }
 
   // Lever mount inside the window.
@@ -216,8 +216,8 @@ export function bulbPixels(mode: MachineMode, tick: number): Pixel[] {
     else if (mode === "printing") on = (i + tick) % 3 !== 0
     else on = true
     const core = on ? PAL.mustardHi : PAL.bulbOff
-    const rim = on ? PAL.mustard : "#46301b"
-    out.push([x, y, core], [x + 1, y, rim], [x, y + 1, rim], [x + 1, y + 1, on ? PAL.mustardSh : "#3a2716"])
+    const rim = on ? PAL.mustard : "#2e1a40"
+    out.push([x, y, core], [x + 1, y, rim], [x, y + 1, rim], [x + 1, y + 1, on ? PAL.mustardSh : "#24132f"])
   })
   return out
 }
@@ -240,8 +240,8 @@ const WHEEL_CELLS: { x: number; y: number; seg: number; edge: boolean }[] = (() 
   return out
 })()
 
-const WHEEL_BRIGHT = [PAL.cream, PAL.mustard, PAL.jade, PAL.vermHi]
-const WHEEL_DIM = ["#8f8466", "#94713a", "#4b6e58", "#8a4c37"]
+const WHEEL_BRIGHT = [PAL.cream, PAL.mustard, PAL.jade, "#e879f9"]
+const WHEEL_DIM = ["#6b5a85", "#1e6b7d", "#145e57", "#7a2a6e"]
 
 export function wheelPixels(mode: MachineMode, rotation: number): Pixel[] {
   const bright = mode !== "idle"

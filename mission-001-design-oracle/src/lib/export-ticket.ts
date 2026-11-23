@@ -2,11 +2,11 @@ import { TONE_META, TOPIC_NAMES, type Fortune } from "@/data/fortunes"
 import { T_W, deliveredState, tikkuPixels } from "@/lib/art/tikku"
 
 const SIZE = 1080
-const BG = "#211f2e"
-const PAPER = "#f3e3b6"
-const PAPER_SH = "#e3cd93"
-const INK = "#2b2320"
-const VERM = "#c4502f"
+const BG = "#100c18"
+const PAPER = "#f5eefe"
+const PAPER_SH = "#ddd0f5"
+const INK = "#2e1065"
+const VERM = "#c026d3"
 
 function stepped(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, s: number, color: string) {
   ctx.fillStyle = color
@@ -33,18 +33,14 @@ function grain(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h
   let seed = 7
   const r = () => ((seed = (seed * 16807) % 2147483647) / 2147483647)
   for (let i = 0; i < 2600; i++) {
-    ctx.fillStyle = r() > 0.5 ? "rgba(120,80,30,0.10)" : "rgba(255,255,255,0.18)"
+    ctx.fillStyle = r() > 0.5 ? "rgba(91,33,182,0.10)" : "rgba(255,255,255,0.18)"
     ctx.fillRect(x + r() * w, y + r() * h, 2, 2)
   }
 }
 
 async function ensureFonts() {
   if (!document.fonts) return
-  await Promise.all([
-    document.fonts.load('700 40px "Courier Prime"'),
-    document.fonts.load('400 20px "Courier Prime"'),
-    document.fonts.load('20px "Press Start 2P"'),
-  ])
+  await document.fonts.load('40px "VT323"')
 }
 
 export async function renderTicket(fortune: Fortune, ticketNo: number, date: string): Promise<Blob> {
@@ -60,18 +56,18 @@ export async function renderTicket(fortune: Fortune, ticketNo: number, date: str
   // Backdrop with pixel dots.
   ctx.fillStyle = BG
   ctx.fillRect(0, 0, SIZE, SIZE)
-  ctx.fillStyle = "rgba(241,221,165,0.07)"
+  ctx.fillStyle = "rgba(233,213,255,0.07)"
   for (let y = 14; y < SIZE; y += 28) for (let x = 14; x < SIZE; x += 28) ctx.fillRect(x, y, 4, 4)
 
   // Brand line.
   ctx.textBaseline = "top"
   ctx.textAlign = "center"
-  ctx.font = '22px "Press Start 2P"'
-  ctx.fillStyle = "#f5b947"
-  ctx.fillText("THE FORTUNE MACHINE", SIZE / 2, 74)
-  ctx.font = '400 26px "Courier Prime"'
-  ctx.fillStyle = "#cbbf9f"
-  ctx.fillText("What's weighing on you today?", SIZE / 2, 116)
+  ctx.font = '58px "VT323"'
+  ctx.fillStyle = "#e879f9"
+  ctx.fillText("THE FORTUNE MACHINE", SIZE / 2, 58)
+  ctx.font = '36px "VT323"'
+  ctx.fillStyle = "#c4b5fd"
+  ctx.fillText("What's weighing on you today?", SIZE / 2, 118)
 
   // Ticket, slightly rotated like it just landed on the table.
   const tw = 860
@@ -106,16 +102,16 @@ export async function renderTicket(fortune: Fortune, ticketNo: number, date: str
   // Header.
   ctx.textAlign = "left"
   ctx.fillStyle = INK
-  ctx.font = '700 24px "Courier Prime"'
+  ctx.font = '35px "VT323"'
   ctx.fillText("THE FORTUNE MACHINE", L, ty + 72)
-  ctx.font = '400 20px "Courier Prime"'
+  ctx.font = '29px "VT323"'
   ctx.globalAlpha = 0.7
   ctx.fillText("PLATFORM 1 · EST. TODAY", L, ty + 102)
   ctx.globalAlpha = 1
   ctx.textAlign = "right"
-  ctx.font = '700 24px "Courier Prime"'
+  ctx.font = '35px "VT323"'
   ctx.fillText(`NO. ${String(ticketNo).padStart(6, "0")}`, R, ty + 72)
-  ctx.font = '400 20px "Courier Prime"'
+  ctx.font = '29px "VT323"'
   ctx.globalAlpha = 0.7
   ctx.fillText(date.toUpperCase(), R, ty + 102)
   ctx.globalAlpha = 1
@@ -130,17 +126,17 @@ export async function renderTicket(fortune: Fortune, ticketNo: number, date: str
 
   // Route + stamp.
   ctx.textAlign = "left"
-  ctx.font = '700 24px "Courier Prime"'
+  ctx.font = '35px "VT323"'
   ctx.fillStyle = INK
   ctx.fillText(`FROM OVERTHINKING → TO ${TOPIC_NAMES[fortune.topic].toUpperCase()}`, L, ty + 168, R - L - 220)
 
   ctx.save()
   ctx.translate(R - 90, ty + 182)
   ctx.rotate(-0.08)
-  ctx.font = '18px "Press Start 2P"'
+  ctx.font = '34px "VT323"'
   const sw = ctx.measureText(tone.stamp).width + 36
   stepped(ctx, -sw / 2, -24, sw, 48, 6, tone.color)
-  ctx.fillStyle = "#fff8e6"
+  ctx.fillStyle = "#faf5ff"
   ctx.textAlign = "center"
   ctx.textBaseline = "middle"
   ctx.fillText(tone.stamp, 0, 2)
@@ -151,21 +147,21 @@ export async function renderTicket(fortune: Fortune, ticketNo: number, date: str
   const maxW = R - L
   const top = ty + 236
   const maxH = 270
-  let size = 54
+  let size = 84
   let lines: string[] = []
-  for (; size >= 32; size -= 2) {
-    ctx.font = `700 ${size}px "Courier Prime"`
+  for (; size >= 48; size -= 2) {
+    ctx.font = `${size}px "VT323"`
     lines = wrap(ctx, fortune.text, maxW)
-    if (lines.length * size * 1.25 <= maxH) break
+    if (lines.length * size * 1.02 <= maxH) break
   }
   ctx.fillStyle = INK
   ctx.textAlign = "left"
-  const blockH = lines.length * size * 1.25
+  const blockH = lines.length * size * 1.02
   const startY = top + (maxH - blockH) / 2
-  lines.forEach((l, i) => ctx.fillText(l, L, startY + i * size * 1.25))
+  lines.forEach((l, i) => ctx.fillText(l, L, startY + i * size * 1.02))
 
   dashed(ty + th - 136)
-  ctx.font = '400 21px "Courier Prime"'
+  ctx.font = '30px "VT323"'
   ctx.fillStyle = INK
   ctx.fillText("No refunds on destiny.", L, ty + th - 112)
   ctx.textAlign = "right"
@@ -182,8 +178,8 @@ export async function renderTicket(fortune: Fortune, ticketNo: number, date: str
     ctx.fillRect(ox + x * scale, oy + y * scale, scale, scale)
   }
   ctx.textAlign = "left"
-  ctx.font = '16px "Press Start 2P"'
-  ctx.fillStyle = "#8f879f"
+  ctx.font = '30px "VT323"'
+  ctx.fillStyle = "#9a86b5"
   ctx.fillText("MISSION 001 · 100 MISSIONS", 70, SIZE - 66)
 
   return new Promise((resolve, reject) =>

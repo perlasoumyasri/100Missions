@@ -33,8 +33,8 @@ function Step({ n, children, id }: { n: number; children: ReactNode; id: string 
 }
 
 const itemClass =
-  "retro relative h-12 w-full justify-start gap-2 rounded-none border-0 px-2 text-[8px] sm:px-2.5 sm:text-[8.5px] leading-[1.35] uppercase shadow-none " +
-  "[--foreground:var(--ink)] bg-[#1b2e3b] text-[#d9cfb0] hover:bg-[#2b475a] hover:text-[#fff8e6] " +
+  "relative h-12 w-full justify-start gap-2.5 rounded-none border-0 px-3 text-[19px] leading-[0.95] tracking-[0.04em] uppercase shadow-none " +
+  "[--foreground:var(--ink)] bg-[#1a1129] text-[#d8c7f0] hover:bg-[#2b1b3b] hover:text-[#faf5ff] " +
   "data-[state=on]:bg-[var(--chip)] data-[state=on]:text-ink data-[state=on]:hover:bg-[var(--chip)] " +
   "focus-visible:ring-0 disabled:opacity-60"
 
@@ -50,22 +50,24 @@ export function ControlPanel({ topic, tone, busy, hasTicket, onTopic, onTone, on
       <ToggleGroup
         type="single"
         variant="outline"
+        font="normal"
         value={topic}
         onValueChange={(v) => v && onTopic(v as TopicMode)}
         aria-labelledby="step-topic"
-        className="grid grid-cols-2 gap-3.5 px-1.5"
+        className="grid grid-cols-2 gap-4 px-1.5"
       >
         {TOPICS.map((t) => (
           <ToggleGroupItem
             key={t.value}
             value={t.value}
             variant="outline"
+            font="normal"
             aria-label={t.label}
             disabled={busy && topic !== t.value}
-            style={{ "--chip": "#f1dda5" } as CSSProperties}
+            style={{ "--chip": "#e9d5ff" } as CSSProperties}
             className={cn(itemClass, topic === t.value && "pressed-chip")}
           >
-            <PixelIcon name={TOPIC_ICON[t.value]} className="size-3.5! shrink-0" />
+            <PixelIcon name={TOPIC_ICON[t.value]} className="size-4! shrink-0" />
             <span className="text-left">{t.label}</span>
           </ToggleGroupItem>
         ))}
@@ -75,23 +77,25 @@ export function ControlPanel({ topic, tone, busy, hasTicket, onTopic, onTone, on
       <ToggleGroup
         type="single"
         variant="outline"
+        font="normal"
         value={tone}
         onValueChange={(v) => v && onTone(v as Tone)}
         aria-labelledby="step-tone"
-        className="grid grid-cols-3 gap-3.5 px-1.5"
+        className="grid grid-cols-3 gap-4 px-1.5"
       >
         {TONES.map((t) => (
           <ToggleGroupItem
             key={t.value}
             value={t.value}
             variant="outline"
+            font="normal"
             aria-label={t.label}
             disabled={busy && tone !== t.value}
-            style={{ "--chip": { roast: "#e4643d", wisdom: "#9fd0e6", hype: "#78b18c" }[t.value] } as CSSProperties}
-            className={cn(itemClass, tone === t.value && "pressed-chip")}
+            style={{ "--chip": { roast: "#f472b6", wisdom: "#c084fc", hype: "#2dd4bf" }[t.value] } as CSSProperties}
+            className={cn(itemClass, "max-sm:justify-center max-sm:px-2 max-sm:text-[17px]", tone === t.value && "pressed-chip")}
           >
-            <PixelIcon name={TONE_ICON[t.value]} className="size-3.5! shrink-0" />
-            <span className="text-left">{t.label}</span>
+            <PixelIcon name={TONE_ICON[t.value]} className="size-4! shrink-0 max-sm:hidden" />
+            <span className="text-left max-sm:text-center">{t.label}</span>
           </ToggleGroupItem>
         ))}
       </ToggleGroup>
@@ -100,18 +104,18 @@ export function ControlPanel({ topic, tone, busy, hasTicket, onTopic, onTone, on
       <div className="px-1.5">
         <Button
           ref={buttonRef}
-          font="retro"
+          font="normal"
           size="lg"
           onClick={onInsert}
           disabled={busy}
           aria-describedby="step-coin"
-          className="coin-button h-14 w-full gap-3 whitespace-normal bg-[#f5b947] text-[11px] leading-tight text-ink [--foreground:var(--ink)] hover:bg-[#ffc95e] disabled:opacity-100 sm:text-[12px]"
+          className="coin-button h-14 w-full gap-3 whitespace-normal bg-[#d946ef] text-[21px] leading-none tracking-[0.04em] text-ink uppercase [--foreground:var(--ink)] hover:bg-[#e879f9] disabled:opacity-100 sm:text-[27px] sm:tracking-[0.06em]"
         >
-          <PixelCoin className={cn("size-6 shrink-0", busy && "opacity-0")} />
-          {busy ? "THE MACHINE IS WORKING…" : hasTicket ? "INSERT ANOTHER COIN" : "INSERT COIN — GET FORTUNE"}
+          <PixelCoin className={cn("size-7 shrink-0", busy && "opacity-0")} />
+          {busy ? "The machine is working…" : hasTicket ? "Insert another coin" : "Insert coin — get fortune"}
         </Button>
       </div>
-      <p className="mt-3 text-center font-terminal text-[17px] leading-none text-[#8fa6b4]">Free to play. No real coins required.</p>
+      <p className="mt-4 text-center text-[19px] leading-none text-[#9a86b5]">Free to play. No real coins required.</p>
     </div>
   )
 }

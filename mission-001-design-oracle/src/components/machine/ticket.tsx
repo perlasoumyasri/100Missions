@@ -36,7 +36,7 @@ export const Ticket = forwardRef<HTMLDivElement, Props>(function Ticket({ fortun
             <span className="opacity-60">To</span> {TOPIC_NAMES[fortune.topic]}
           </p>
           <span className="ticket-stamp" style={{ ["--stamp" as string]: tone.color }}>
-            <Badge font="retro" className="h-6 bg-[var(--stamp)] border-[var(--stamp)] text-[#fff8e6] text-[8px]">
+            <Badge font="normal" className="h-7 bg-[var(--stamp)] border-[var(--stamp)] text-[#faf5ff] text-[19px] tracking-[0.1em]">
               {tone.stamp}
             </Badge>
           </span>

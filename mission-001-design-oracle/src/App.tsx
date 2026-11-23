@@ -263,9 +263,9 @@ export default function App() {
 
   return (
     <div className="crt app-bg min-h-dvh overflow-x-clip">
-      <header className="mx-auto flex max-w-[1380px] items-center justify-between gap-4 px-4 pt-4 sm:px-8 sm:pt-5">
-        <p className="retro text-[9px] leading-relaxed tracking-wider text-[#a99f86] sm:text-[10px]">
-          <span className="text-[#f5b947]">MISSION 001</span> / THE FORTUNE MACHINE
+      <header className="mx-auto flex max-w-[1380px] items-center justify-between gap-4 px-4 pt-4 sm:px-8 sm:pt-6">
+        <p className="text-[18px] leading-none tracking-[0.08em] text-[#b8a6d9] uppercase sm:text-[22px] sm:tracking-[0.1em]">
+          <span className="text-[#22d3ee]">MISSION 001</span> / THE FORTUNE MACHINE
         </p>
         <Toggle
           variant="outline"
@@ -278,23 +278,24 @@ export default function App() {
             if (on) sfx.press()
           }}
           aria-label="Sound effects"
-          className="mx-1.5 h-8 shrink-0 gap-2 bg-[#2c2a3d] px-2.5 text-[8px] whitespace-nowrap text-[#cfc6ad] [--foreground:var(--ink)] hover:bg-[#3a3750] hover:text-[#fff8e6] data-[state=on]:bg-[#78b18c] data-[state=on]:text-ink"
+          font="normal"
+          className="mx-1.5 h-9 shrink-0 gap-2 bg-[#2b1b3b] px-3 text-[20px] whitespace-nowrap text-[#d8c7f0] [--foreground:var(--ink)] hover:bg-[#3b0764] hover:text-[#faf5ff] data-[state=on]:bg-[#14b8a6] data-[state=on]:text-ink"
         >
           <PixelIcon name={sound ? "soundOn" : "soundOff"} className="size-3.5!" />
           SOUND {sound ? "ON" : "OFF"}
         </Toggle>
       </header>
 
-      <main className="stage mx-auto max-w-[1380px] px-4 pt-5 pb-12 sm:px-8 lg:pt-4">
+      <main className="stage mx-auto max-w-[1380px] px-4 pt-6 pb-12 sm:px-8 lg:pt-4">
         <section className="[grid-area:intro]">
-          <h1 className="retro text-[clamp(1.05rem,2.3vw,1.6rem)] leading-[1.35] text-[#f1dda5] [text-shadow:3px_3px_0_var(--ink)]">
+          <h1 className="vhs-title text-[clamp(3rem,5.6vw,5.25rem)] leading-[0.82] tracking-[0.02em] text-[#f3e8ff] uppercase">
             THE FORTUNE
-            <br className="hidden lg:block" /> <span className="text-[#e4643d]">MACHINE</span>
+            <br className="hidden lg:block" /> <span className="text-[#e879f9]">MACHINE</span>
           </h1>
-          <p className="mt-3 font-body text-[clamp(1.15rem,1.7vw,1.45rem)] leading-snug font-semibold text-[#fff8e6] lg:mt-4">
+          <p className="mt-4 text-[clamp(1.75rem,2.4vw,2.1rem)] leading-none text-[#faf5ff] lg:mt-6">
             What&rsquo;s weighing on you today?
           </p>
-          <p className="mt-1 font-terminal text-[21px] leading-tight text-[#f5b947]">Insert a coin. The universe has opinions.</p>
+          <p className="mt-2 text-[22px] leading-tight text-[#22d3ee]">Insert a coin. The universe has opinions.</p>
         </section>
 
         <section aria-label="The Fortune Machine" className="[grid-area:machine] relative self-center pt-14 lg:pt-16">
@@ -336,33 +337,33 @@ export default function App() {
                 <Ticket fortune={lastFortune} ticketNo={ticketNo} date={date} />
                 {lastFortune.tone === "hype" && !reducedMotion && <Confetti key={draws} />}
               </div>
-              <div className={cn("mt-7 flex flex-wrap gap-x-5 gap-y-4 px-1.5 transition-opacity duration-300", busy ? "opacity-0" : "opacity-100")}>
+              <div className={cn("mt-8 flex flex-wrap gap-x-5 gap-y-5 px-1.5 transition-opacity duration-300", busy ? "opacity-0" : "opacity-100")}>
                 <Button
-                  font="retro"
+                  font="normal"
                   size="sm"
                   onClick={(e) => insertCoin(e.currentTarget)}
                   disabled={busy}
-                  className="h-10 bg-[#f5b947] px-3 text-[9px] text-ink [--foreground:var(--ink)] hover:bg-[#ffc95e]"
+                  className="h-10 bg-[#d946ef] px-4 text-[21px] text-ink uppercase [--foreground:var(--ink)] hover:bg-[#e879f9]"
                 >
-                  <PixelIcon name="again" className="size-3.5!" /> ANOTHER FORTUNE
+                  <PixelIcon name="again" className="size-4!" /> Another fortune
                 </Button>
                 <Button
-                  font="retro"
+                  font="normal"
                   size="sm"
                   onClick={onCopy}
                   disabled={busy}
-                  className="h-10 bg-[#f1dda5] px-3 text-[9px] text-ink [--foreground:var(--ink)] hover:bg-[#fff1c9]"
+                  className="h-10 bg-[#e9d5ff] px-4 text-[21px] text-ink uppercase [--foreground:var(--ink)] hover:bg-[#f3e8ff]"
                 >
-                  <PixelIcon name="copy" className="size-3.5!" /> COPY
+                  <PixelIcon name="copy" className="size-4!" /> Copy
                 </Button>
                 <Button
-                  font="retro"
+                  font="normal"
                   size="sm"
                   onClick={onSave}
                   disabled={busy || saving}
-                  className="h-10 bg-[#f1dda5] px-3 text-[9px] text-ink [--foreground:var(--ink)] hover:bg-[#fff1c9]"
+                  className="h-10 bg-[#e9d5ff] px-4 text-[21px] text-ink uppercase [--foreground:var(--ink)] hover:bg-[#f3e8ff]"
                 >
-                  <PixelIcon name="save" className="size-3.5!" /> {saving ? "SAVING…" : "SAVE PNG"}
+                  <PixelIcon name="save" className="size-4!" /> {saving ? "Saving…" : "Save PNG"}
                 </Button>
               </div>
               <p className="sr-only" aria-live="polite">
@@ -372,8 +373,8 @@ export default function App() {
           ) : (
             <div className="ticket-placeholder">
               <PixelCoin className="size-8 opacity-80" />
-              <p className="retro text-[9px] leading-relaxed text-[#cfc6ad]">YOUR TICKET PRINTS HERE</p>
-              <p className="font-terminal text-[20px] leading-tight text-[#8f879f]">
+              <p className="text-[24px] leading-none tracking-[0.08em] text-[#d8c7f0] uppercase">Your ticket prints here</p>
+              <p className="max-w-[30ch] text-[20px] leading-tight text-[#9a86b5]">
                 Pick what&rsquo;s on your mind, choose a fortune, then feed the machine a coin.
               </p>
             </div>
@@ -393,7 +394,7 @@ export default function App() {
 }
 
 function Confetti() {
-  const colors = ["#f5b947", "#e4643d", "#78b18c", "#f1dda5", "#9fd0e6"]
+  const colors = ["#22d3ee", "#d946ef", "#14b8a6", "#e9d5ff", "#f472b6"]
   return (
     <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-1/3">
       {Array.from({ length: 22 }, (_, i) => {

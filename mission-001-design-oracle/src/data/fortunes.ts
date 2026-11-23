@@ -17,9 +17,9 @@ export const TOPICS: { value: TopicMode; label: string; short: string }[] = [
 ]
 
 export const TONES: { value: Tone; label: string; stamp: string; color: string }[] = [
-  { value: "roast", label: "Roast Me", stamp: "ROASTED", color: "#E4643D" },
-  { value: "wisdom", label: "Give Me Wisdom", stamp: "WISDOM", color: "#243A4A" },
-  { value: "hype", label: "Hype Me Up", stamp: "HYPE", color: "#3F8A5C" },
+  { value: "roast", label: "Roast Me", stamp: "ROASTED", color: "#db2777" },
+  { value: "wisdom", label: "Give Me Wisdom", stamp: "WISDOM", color: "#7c3aed" },
+  { value: "hype", label: "Hype Me Up", stamp: "HYPE", color: "#0d9488" },
 ]
 
 export const TOPIC_NAMES: Record<Topic, string> = {

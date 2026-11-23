@@ -1,9 +1,4 @@
-@import "@fontsource/press-start-2p/400.css";
 @import "@fontsource/vt323/400.css";
-@import "@fontsource/space-grotesk/500.css";
-@import "@fontsource/space-grotesk/600.css";
-@import "@fontsource/courier-prime/400.css";
-@import "@fontsource/courier-prime/700.css";
 @import "tailwindcss";
 
 /* ------------------------------------------------------------------ */
@@ -11,31 +6,35 @@
 /* ------------------------------------------------------------------ */
 
 :root {
-  --ink: #16131f;
-  --background: #211f2e;
-  --foreground: #fff8e6;
-  --card: #243a4a;
-  --card-foreground: #fff8e6;
-  --popover: #243a4a;
-  --popover-foreground: #fff8e6;
-  --primary: #f5b947;
-  --primary-foreground: #16131f;
-  --secondary: #f1dda5;
-  --secondary-foreground: #16131f;
-  --muted: #2c2a3d;
-  --muted-foreground: #a99f86;
-  --accent: #e4643d;
-  --accent-foreground: #16131f;
-  --destructive: #e4643d;
-  --border: #3a3750;
-  --input: #3a3750;
-  --ring: #f5b947;
+  /* 8bitcn "VHS" theme, dark variant (converted from the theme's oklch values) */
+  --ink: #06040a;
+  --background: #100c18;
+  --foreground: #e9d5ff;
+  --card: #181123;
+  --card-foreground: #e9d5ff;
+  --popover: #181123;
+  --popover-foreground: #e9d5ff;
+  --primary: #d946ef;
+  --primary-foreground: #1e293b;
+  --secondary: #a855f7;
+  --secondary-foreground: #f3e8ff;
+  --muted: #2b1b3b;
+  --muted-foreground: #a8a29e;
+  --accent: #4a044e;
+  --accent-foreground: #f0abfc;
+  --destructive: #be185d;
+  --border: #3b0764;
+  --input: #3b0764;
+  --ring: #0ea5e9;
+  --radius: 0.3rem;
+  --tracking-normal: 0.05rem;
+  --glow: 0 0 8px 1px rgb(14 165 233 / 0.25);
 
-  --cream: #f1dda5;
-  --vermilion: #e4643d;
-  --petrol: #243a4a;
-  --mustard: #f5b947;
-  --jade: #78b18c;
+  --lavender: #e9d5ff;
+  --fuchsia: #d946ef;
+  --violet: #a855f7;
+  --cyan: #22d3ee;
+  --teal: #14b8a6;
 
   color-scheme: dark;
 }
@@ -61,10 +60,7 @@
   --color-input: var(--input);
   --color-ring: var(--ring);
 
-  --font-pixel: "Press Start 2P", ui-monospace, monospace;
-  --font-terminal: "VT323", ui-monospace, monospace;
-  --font-body: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
-  --font-ticket: "Courier Prime", ui-monospace, "Courier New", monospace;
+  --font-vhs: "VT323", ui-monospace, monospace;
 }
 
 @layer base {
@@ -79,21 +75,32 @@
     margin: 0;
     min-height: 100dvh;
     color: var(--foreground);
-    font-family: var(--font-body);
+    font-family: var(--font-vhs);
+    font-size: 20px;
+    letter-spacing: var(--tracking-normal);
     -webkit-font-smoothing: antialiased;
   }
+  /* The VHS theme sets every font to VT323, including 8bitcn's "retro" text. */
+  :root .retro {
+    font-family: var(--font-vhs);
+    letter-spacing: var(--tracking-normal);
+  }
+  [data-sonner-toast] .retro p {
+    font-size: 22px;
+    line-height: 1;
+  }
   ::selection {
-    background: var(--mustard);
+    background: var(--fuchsia);
     color: var(--ink);
   }
   :focus-visible {
-    outline: 3px solid var(--mustard);
+    outline: 3px solid var(--ring);
     outline-offset: 4px;
   }
   /* 8bitcn controls draw pixel borders outside their box, so push the ring past them. */
   button:focus-visible,
   [role="radio"]:focus-visible {
-    outline: 3px solid var(--mustard) !important;
+    outline: 3px solid var(--ring) !important;
     outline-offset: 9px !important;
   }
 }
@@ -104,7 +111,7 @@
 
 .app-bg {
   background-color: var(--background);
-  background-image: radial-gradient(rgb(241 221 165 / 0.06) 1px, transparent 1.5px);
+  background-image: radial-gradient(rgb(233 213 255 / 0.06) 1px, transparent 1.5px);
   background-size: 18px 18px;
 }
 
@@ -150,6 +157,13 @@
   }
 }
 
+.vhs-title {
+  text-shadow:
+    -2px 0 rgb(34 211 238 / 0.75),
+    2px 0 rgb(217 70 239 / 0.75),
+    4px 5px 0 var(--ink);
+}
+
 .sprite {
   image-rendering: pixelated;
   shape-rendering: crispEdges;
@@ -161,13 +175,14 @@
 
 .panel {
   position: relative;
-  padding: 22px 18px 18px;
-  background: var(--petrol);
+  padding: 24px 20px 20px;
+  background: #1c1330;
   box-shadow:
-    inset 0 4px 0 #33536a,
-    inset 0 -4px 0 #172734,
+    inset 0 4px 0 #3b0764,
+    inset 0 -4px 0 #150f22,
     0 0 0 4px var(--ink),
-    8px 8px 0 4px var(--ink);
+    8px 8px 0 4px var(--ink),
+    var(--glow);
   clip-path: polygon(
     -12px 4px, 4px 4px, 4px -12px, calc(100% - 4px) -12px, calc(100% - 4px) 4px, calc(100% + 12px) 4px,
     calc(100% + 12px) calc(100% + 16px), -12px calc(100% + 16px)
@@ -177,20 +192,19 @@
   position: absolute;
   width: 6px;
   height: 6px;
-  background: var(--mustard);
-  box-shadow: 2px 2px 0 #172734;
+  background: var(--cyan);
+  box-shadow: 2px 2px 0 #150f22;
 }
 .panel-step {
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin: 16px 0 12px;
-  font-family: var(--font-pixel);
-  font-size: 9px;
-  line-height: 1.4;
-  letter-spacing: 0.04em;
+  gap: 12px;
+  margin: 24px 0 12px;
+  font-size: 23px;
+  line-height: 1;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--cream);
+  color: var(--lavender);
 }
 .panel-step:first-of-type {
   margin-top: 4px;
@@ -201,9 +215,9 @@
   width: 20px;
   height: 20px;
   flex: none;
-  background: var(--mustard);
+  background: var(--cyan);
   color: var(--ink);
-  font-size: 9px;
+  font-size: 20px;
   box-shadow: 2px 2px 0 var(--ink);
 }
 .pressed-chip {
@@ -224,10 +238,9 @@
   width: max-content;
   max-width: min(230px, 48vw);
   padding: 8px 12px 9px;
-  background: var(--cream);
-  color: var(--ink);
-  font-family: var(--font-terminal);
-  font-size: 21px;
+  background: var(--lavender);
+  color: #2e1065;
+  font-size: 23px;
   line-height: 0.95;
   white-space: normal;
   box-shadow:
@@ -248,13 +261,13 @@
   bottom: -10px;
   width: 10px;
   height: 10px;
-  background: var(--cream);
+  background: var(--lavender);
   box-shadow: 3px 3px 0 var(--ink);
   clip-path: polygon(0 0, 100% 0, 0 100%);
 }
 @media (min-width: 1024px) {
   .speech {
-    font-size: 23px;
+    font-size: 25px;
   }
 }
 
@@ -264,8 +277,8 @@
 
 .ticket-stub {
   padding: 6%;
-  background: #f3e3b6;
-  box-shadow: inset 0 -3px 0 #e3cd93;
+  background: #f5eefe;
+  box-shadow: inset 0 -3px 0 #ddd0f5;
   transition: opacity 0.12s;
 }
 .ticket-stub-inner {
@@ -275,12 +288,12 @@
   gap: 14%;
   height: 100%;
   padding: 0 10%;
-  border: 2px solid #c4502f;
+  border: 2px solid #c026d3;
 }
 .ticket-stub-inner i {
   display: block;
   height: 2px;
-  background: #2b2320;
+  background: #2e1065;
   opacity: 0.55;
 }
 .ticket-stub-inner i:nth-child(1) {
@@ -316,21 +329,21 @@
 }
 
 .ticket {
-  --paper: #f3e3b6;
+  --paper: #f5eefe;
   position: relative;
   padding: 14px;
-  color: #2b2320;
-  font-family: var(--font-ticket);
+  color: #2e1065;
   background-color: var(--paper);
   background-image:
-    radial-gradient(rgb(120 80 30 / 0.1) 0.8px, transparent 1.2px),
+    radial-gradient(rgb(91 33 182 / 0.1) 0.8px, transparent 1.2px),
     radial-gradient(rgb(255 255 255 / 0.25) 0.8px, transparent 1.2px);
   background-size: 7px 7px, 11px 11px;
   background-position: 0 0, 3px 5px;
   box-shadow:
-    inset 0 0 0 1px rgb(120 80 30 / 0.18),
-    inset 0 -4px 0 #e3cd93,
-    10px 12px 0 rgb(0 0 0 / 0.35);
+    inset 0 0 0 1px rgb(91 33 182 / 0.18),
+    inset 0 -4px 0 #ddd0f5,
+    10px 12px 0 rgb(0 0 0 / 0.45),
+    var(--glow);
   rotate: -1.5deg;
   transition: rotate 0.25s ease, translate 0.25s ease;
   /* Perforated notches on both sides */
@@ -349,26 +362,25 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
-  padding: 16px 20px 14px;
-  border: 3px double #c4502f;
-  outline: 1px solid rgb(196 80 47 / 0.35);
+  padding: clamp(12px, 3.5vw, 16px) clamp(12px, 4vw, 20px) clamp(12px, 3.5vw, 14px);
+  border: 3px double #c026d3;
+  outline: 1px solid rgb(192 38 211 / 0.35);
   outline-offset: 3px;
 }
 .ticket-label {
-  font-size: 11.5px;
-  font-weight: 700;
-  line-height: 1.3;
-  letter-spacing: 0.12em;
+  font-size: clamp(15px, 4.2vw, 19px);
+  line-height: 1;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
 }
 .ticket-rule {
   height: 2px;
-  background: repeating-linear-gradient(to right, rgb(43 35 32 / 0.45) 0 6px, transparent 6px 11px);
+  background: repeating-linear-gradient(to right, rgb(46 16 101 / 0.45) 0 6px, transparent 6px 11px);
 }
 .ticket-route {
-  font-size: 12.5px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
+  font-size: clamp(16px, 4.4vw, 19px);
+  line-height: 1;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
 }
 .ticket-stamp {
@@ -378,16 +390,17 @@
   opacity: 0.92;
 }
 .ticket-fortune {
-  margin: 6px 0 4px;
-  font-size: clamp(19px, 2vw, 22px);
-  font-weight: 700;
-  line-height: 1.32;
+  margin: 4px 0;
+  font-size: clamp(29px, 2.6vw, 34px);
+  line-height: 1;
+  letter-spacing: 0.02em;
   text-wrap: pretty;
 }
 .ticket-small {
-  font-size: 11px;
-  line-height: 1.35;
-  letter-spacing: 0.02em;
+  font-size: clamp(14px, 3.8vw, 17px);
+  line-height: 1;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 
 .ticket-placeholder {
@@ -396,7 +409,7 @@
   gap: 14px;
   padding: 44px 28px;
   text-align: center;
-  border: 3px dashed #3f3b55;
+  border: 3px dashed #3b0764;
   rotate: -1.5deg;
 }
 

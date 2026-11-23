@@ -1,6 +1,6 @@
 /**
  * Tikku: the tiny fortune-keeper who lives inside the machine's window.
- * A round chai-coloured creature in a railway cap. One base body,
+ * A round lavender creature in a fuchsia railway cap. One base body,
  * with eyes, brows, mouth and arms swapped per animation state.
  */
 import { Grid, type Pixel } from "@/lib/pixel/grid"
@@ -10,22 +10,22 @@ export const T_W = 26
 export const T_H = 26
 
 const C = {
-  ink: "#16131f",
-  body: "#f6d39b",
-  bodyHi: "#ffe9c2",
-  bodySh: "#d9a868",
-  cheek: "#f08a6a",
-  cap: "#e4643d",
-  capSh: "#b9472a",
-  capHi: "#f4875d",
-  visor: "#2a1d22",
-  badge: "#f5b947",
-  feet: "#7a4a2e",
+  ink: "#06040a",
+  body: "#f3e8ff",
+  bodyHi: "#ffffff",
+  bodySh: "#c4b5fd",
+  cheek: "#f472b6",
+  cap: "#d946ef",
+  capSh: "#a21caf",
+  capHi: "#f0abfc",
+  visor: "#1e1030",
+  badge: "#22d3ee",
+  feet: "#581c87",
   white: "#ffffff",
-  tongue: "#e4643d",
-  star: "#f5b947",
+  tongue: "#ec4899",
+  star: "#22d3ee",
   sweat: "#8fd0f0",
-  stache: "#4a2b22",
+  stache: "#3b0764",
 }
 
 export type TikkuState =

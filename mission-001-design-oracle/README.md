@@ -13,18 +13,18 @@
 
 Build a small, working app with a strong 8-bit style using the 8bitcn UI library.
 
-V1 was "The Design Oracle", a quote generator for designers. V2 turns it into **The Fortune Machine**, inspired by the coin-operated weighing machines on Indian railway platforms. You step up, drop a coin, the wheel spins, the machine whirs, and out comes a printed ticket. It doesn't weigh you. It weighs what's on your mind.
+V1 was "The Design Oracle", a quote generator for designers. V2 turns it into **The Fortune Machine**, inspired by the coin-operated weighing machines on Indian railway platforms, dressed in 8bitcn's **VHS theme**. You step up, drop a coin, the wheel spins, the machine whirs, and out comes a printed ticket. It doesn't weigh you. It weighs what's on your mind.
 
 ## 🛠️ What I built
 
 - **The machine:** an original pixel-art railway machine drawn as SVG pixel geometry. It has an octagonal head with a ring of chasing bulbs, an illuminated fortune wheel, a name sign, a ₹1 coin slot, a gauge with a moving needle, status lamps, a ticket dispenser and a weighing platform with footprints.
-- **Tikku, the fortune-keeper:** a tiny chai-coloured creature in a railway cap and handlebar mustache, living in the machine's window. One base sprite with 13 animation frames:
+- **Tikku, the fortune-keeper:** a tiny lavender creature in a fuchsia railway cap and handlebar mustache, living in the machine's window. One base sprite with 13 animation frames:
   - **Idle:** breathes, blinks, glances around and occasionally looks smug.
   - **Coin received:** jumps with a "!" and turns to the mechanism.
   - **Calculating:** squeezes his eyes shut and pulls a tiny lever. The bulbs flash in time and he breaks a sweat.
   - **Delivered:** a sly wink for a Roast, a knowing look for Wisdom, star eyes and waving arms for Hype.
 - **The ritual, in about two seconds:** the coin flies into the slot, the machine wakes up, the wheel spins, the printer clicks, and a ticket prints out of the dispenser and lands in front of you.
-- **Collectible tickets:** cream paper with grain, a double vermilion frame, perforated notches, a ticket number, a "From Overthinking → To Work & Ambition" route, a rubber stamp for the fortune type and readable typewriter text.
+- **Collectible tickets:** lavender paper with grain, a double fuchsia frame, perforated notches, a ticket number, a "From Overthinking → To Work & Ambition" route, a rubber stamp for the fortune type and readable typewriter text.
 - **81 original fortunes,** for everyone, not just designers: 3 topics × 3 tones × 9 each. They're drawn without repeats until a pool runs out, and never the same one twice in a row.
 - **Sound design:** six original Web Audio effects (coin, activation, wheel spin, printer, reveal chime and button click) through one quiet master bus. Sound is muted by default and starts only when you turn it on.
 - **Copy fortune** and **save ticket as a 1080×1080 PNG**.
@@ -33,6 +33,20 @@ V1 was "The Design Oracle", a quote generator for designers. V2 turns it into **
 - **Layouts:** responsive from 390px phones to large desktops. The machine art always snaps to whole device pixels, so it stays crisp.
 
 ![Sample ticket](docs/sample-card.png)
+
+### Theme: 8bitcn "VHS"
+
+The whole app uses the dark variant of 8bitcn's [VHS theme](https://www.8bitcn.com/themes?theme=vhs). The colours were converted from the theme's oklch values to hex:
+
+- **Background:** `#100c18`
+- **Card:** `#181123`
+- **Text:** lavender `#e9d5ff`
+- **Primary:** fuchsia `#d946ef`
+- **Secondary:** violet `#a855f7`
+- **Ring and glow:** cyan `#0ea5e9`
+- **Accents:** teal and pink
+
+**Type and spacing** also follow the theme: VT323 for every font, 0.05rem letter spacing, a 0.25rem spacing scale and a soft cyan glow. The title adds a VHS colour-split.
 
 ### 8bitcn components used
 
@@ -85,6 +99,7 @@ src/
 
 ## 📝 Notes
 
+- The theme values were read from 8bitcn's source (`app/retro-globals.css`, `.theme-vhs`).
 - The 8bitcn components were copied from 8bitcn's official GitHub repo, because the cloud environment couldn't reach 8bitcn.com. That's the same thing `shadcn add` does. Two small changes: removed one unused import in `toast.tsx`, and removed the Google Fonts `@import` from `retro.css` because fonts are bundled locally.
 - All fortunes are original. None are attributed to real people.
 
