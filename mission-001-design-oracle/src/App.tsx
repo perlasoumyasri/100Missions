@@ -58,7 +58,8 @@ interface CoinFlight {
 export default function App() {
   const reducedMotion = usePrefersReducedMotion()
   const vp = useViewport()
-  const wide = vp.w >= 1024
+  const wide = vp.w >= 1200
+  const mid = vp.w >= 768
 
   const [topic, setTopic] = useState<TopicMode>("surprise")
   const [tone, setTone] = useState<Tone>("roast")
@@ -281,7 +282,7 @@ export default function App() {
 
   return (
     <div className="crt app-bg min-h-dvh overflow-x-clip">
-      <header className="mx-auto flex max-w-[1380px] items-center justify-between gap-4 px-4 pt-4 sm:px-8 sm:pt-6">
+      <header className="mx-auto flex max-w-[1560px] items-center justify-between gap-4 px-4 pt-4 sm:px-8 sm:pt-6">
         <p className="text-[18px] leading-none tracking-[0.08em] text-[#b8a6d9] uppercase sm:text-[22px] sm:tracking-[0.1em]">
           <span className="text-[#22d3ee]">MISSION 001</span> / THE FORTUNE MACHINE
         </p>
@@ -304,11 +305,11 @@ export default function App() {
         </Toggle>
       </header>
 
-      <main className="stage mx-auto max-w-[1380px] px-4 pt-6 pb-12 sm:px-8 lg:pt-4">
+      <main className="stage mx-auto max-w-[1560px] px-4 pt-6 pb-12 sm:px-8 lg:pt-4">
         <section className="[grid-area:intro]">
           <h1 className="vhs-title text-[clamp(3rem,5.6vw,5.25rem)] leading-[0.82] tracking-[0.02em] text-[#f3e8ff] uppercase">
             THE FORTUNE
-            <br className="hidden lg:block" /> <span className="text-[#e879f9]">MACHINE</span>
+            <br className="hidden md:block" /> <span className="text-[#e879f9]">MACHINE</span>
           </h1>
           <p className="mt-4 text-[clamp(1.75rem,2.4vw,2.1rem)] leading-none text-[#faf5ff] lg:mt-6">
             What&rsquo;s weighing on you today?
@@ -323,8 +324,10 @@ export default function App() {
             tone={fortune?.tone ?? null}
             line={line}
             reducedMotion={reducedMotion}
-            maxHeight={wide ? Math.max(400, vp.h - 150) : Math.min(520, Math.max(400, vp.h * 0.62))}
-            maxWidth={wide ? Math.min(380, vp.w * 0.27) : vp.w - 32}
+            maxHeight={
+              wide ? Math.max(400, vp.h - 150) : mid ? Math.min(680, Math.max(420, vp.h - 130)) : Math.min(520, Math.max(400, vp.h * 0.62))
+            }
+            maxWidth={wide ? Math.min(460, vp.w * 0.27) : mid ? Math.min(380, (vp.w - 64) * 0.42) : vp.w - 32}
             stubVisible={stubVisible}
           />
         </section>
@@ -348,7 +351,7 @@ export default function App() {
           />
         </section>
 
-        <section aria-label="Your ticket" className={cn("tray [grid-area:tray]", !lastFortune && "max-lg:hidden")}>
+        <section aria-label="Your ticket" className={cn("tray [grid-area:tray]", !lastFortune && "max-xl:hidden")}>
           {lastFortune ? (
             <div className={cn("transition-opacity duration-200", !showTicket && "opacity-0")}>
               <div ref={ticketWrap} className="ticket-wrap" key={draws}>

@@ -135,7 +135,34 @@
   width: 100%;
   max-width: 460px;
 }
-@media (min-width: 1024px) {
+/* Tablets and small laptops: machine on the left, controls on the right, ticket below. */
+@media (min-width: 768px) {
+  .stage {
+    grid-template-columns: auto minmax(0, 440px);
+    grid-template-rows: 1fr auto auto 1fr auto;
+    grid-template-areas:
+      "machine ."
+      "machine intro"
+      "machine panel"
+      "machine ."
+      "tray tray";
+    justify-content: center;
+    column-gap: 40px;
+    row-gap: 24px;
+  }
+  .stage > section {
+    max-width: none;
+  }
+  .stage > section[aria-label="The Fortune Machine"] {
+    width: auto;
+  }
+  .stage > section[aria-label="Your ticket"] {
+    max-width: 480px;
+    margin-top: 8px;
+  }
+}
+/* Desktops: controls | machine | ticket. */
+@media (min-width: 1200px) {
   .stage {
     grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
     grid-template-rows: 1fr auto auto 1fr;
@@ -144,16 +171,15 @@
       "intro machine tray"
       "panel machine tray"
       ". machine tray";
-    column-gap: clamp(24px, 3vw, 48px);
+    justify-content: stretch;
+    column-gap: clamp(32px, 3vw, 56px);
     row-gap: 20px;
     align-items: start;
     min-height: calc(100dvh - 64px);
   }
-  .stage > section {
+  .stage > section[aria-label="Your ticket"] {
     max-width: none;
-  }
-  .stage > section[aria-label="The Fortune Machine"] {
-    width: auto;
+    margin-top: 0;
   }
 }
 
@@ -249,7 +275,13 @@
   translate: 0 -100%;
   left: 36%;
 }
-@media (min-width: 1024px) {
+@media (min-width: 768px) and (max-width: 1199px) {
+  .speech {
+    left: 16%;
+    max-width: 200px;
+  }
+}
+@media (min-width: 1200px) {
   .speech {
     left: 69.4%;
   }
@@ -265,7 +297,7 @@
   box-shadow: 3px 3px 0 var(--ink);
   clip-path: polygon(0 0, 100% 0, 0 100%);
 }
-@media (min-width: 1024px) {
+@media (min-width: 1200px) {
   .speech {
     font-size: 25px;
   }
@@ -317,7 +349,7 @@
 .tray {
   position: relative;
 }
-@media (min-width: 1024px) {
+@media (min-width: 1200px) {
   .tray {
     align-self: center;
   }
