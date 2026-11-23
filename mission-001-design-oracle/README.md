@@ -26,7 +26,7 @@ V1 was "The Design Oracle", a quote generator for designers. V2 turns it into **
 - **The ritual, in about two seconds:** the coin flies into the slot, the machine wakes up, the wheel spins, the printer clicks, and a ticket prints out of the dispenser and lands in front of you.
 - **Collectible tickets:** lavender paper with grain, a double fuchsia frame, perforated notches, a ticket number, a "From Overthinking → To Work & Ambition" route, a rubber stamp for the fortune type and readable typewriter text.
 - **81 original fortunes,** for everyone, not just designers: 3 topics × 3 tones × 9 each. They're drawn without repeats until a pool runs out, and never the same one twice in a row.
-- **Sound design:** six original Web Audio effects (coin, activation, wheel spin, printer, reveal chime and button click) through one quiet master bus. Sound is muted by default and starts only when you turn it on.
+- **Sound design:** six original Web Audio effects (coin, activation, wheel spin, printer, reveal chime and button click) through one quiet master bus. Sound is on by default and starts with your first click or tap (browsers block audio before that). The toggle at the top mutes it.
 - **Copy fortune** and **save ticket as a 1080×1080 PNG**.
 - **Pixel confetti** for Hype fortunes.
 - **Accessibility:** keyboard focus rings and screen-reader announcements. With *reduced motion* on, the ticket appears instantly with no animations.

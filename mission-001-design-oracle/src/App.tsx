@@ -67,7 +67,7 @@ export default function App() {
   const [ticketNo, setTicketNo] = useState(() => 4200 + Math.floor(Math.random() * 700))
   const [draws, setDraws] = useState(0)
   const [line, setLine] = useState(LINES.idle[0])
-  const [sound, setSound] = useState(false)
+  const [sound, setSound] = useState(true)
   const [busy, setBusy] = useState(false)
   const [stubVisible, setStubVisible] = useState(false)
   const [coin, setCoin] = useState<CoinFlight | null>(null)
@@ -81,12 +81,30 @@ export default function App() {
   const bags = useRef(new Map<string, ShuffleBag<Fortune>>())
   const lastShown = useRef<Fortune | undefined>(undefined)
   const busyRef = useRef(false)
-  const soundRef = useRef(false)
+  const soundRef = useRef(true)
   const timers = useRef<number[]>([])
   const flightPending = useRef(false)
 
   // soundRef is kept in sync by the sound toggle, so timers always read the latest value.
-  const play = (fn: () => void) => soundRef.current && fn()
+  const play = (fn: () => void) => {
+    if (!soundRef.current) return
+    unlockAudio()
+    fn()
+  }
+
+  // Sound is on by default, but browsers only allow audio after the visitor
+  // interacts with the page, so the audio engine starts on the first click or key press.
+  useEffect(() => {
+    const unlock = () => {
+      if (soundRef.current) unlockAudio()
+    }
+    window.addEventListener("pointerdown", unlock, { once: true })
+    window.addEventListener("keydown", unlock, { once: true })
+    return () => {
+      window.removeEventListener("pointerdown", unlock)
+      window.removeEventListener("keydown", unlock)
+    }
+  }, [])
 
   useEffect(() => () => timers.current.forEach((t) => window.clearTimeout(t)), [])
   const later = (ms: number, fn: () => void) => timers.current.push(window.setTimeout(fn, ms))
