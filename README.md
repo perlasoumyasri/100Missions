@@ -10,7 +10,7 @@ Each mission is a self-contained project in its own folder, and every one gets p
 
 | # | Mission | Date | Tech | Post |
 |---|---------|------|------|------|
-| 001 | [The Design Oracle](mission-001-design-oracle/): an 8-bit fortune teller for designers | 2026-11-23 | React, TypeScript, Tailwind, 8bitcn | |
+| 001 | [The Fortune Machine](mission-001-design-oracle/): an 8-bit railway fortune machine ([live](https://100-missions.vercel.app/mission-001/)) | 2026-11-23 | React, TypeScript, Tailwind, 8bitcn, Web Audio | |
 
 ## 📁 Structure
 

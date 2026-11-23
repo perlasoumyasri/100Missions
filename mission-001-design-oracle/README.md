@@ -1,51 +1,50 @@
-# Mission 001: The Design Oracle
+# Mission 001: The Fortune Machine
 
 **Date:** 2026-11-23
-**Tech:** React 19 · TypeScript · Vite · Tailwind CSS v4 · [8bitcn](https://www.8bitcn.com/)
+**Live:** https://100-missions.vercel.app/mission-001/
+**Tech:** React 19 · TypeScript · Vite · Tailwind CSS v4 · [8bitcn](https://www.8bitcn.com/) · Web Audio API
 
-> *Your design destiny awaits. The Oracle knows things. Unfortunately.*
+> *What's weighing on you today?*
+> *Insert a coin. The universe has opinions.*
 
-![The Design Oracle](docs/preview.png)
+![The Fortune Machine](docs/preview.png)
 
 ## 🎯 The mission
 
 Build a small, working app with a strong 8-bit style using the 8bitcn UI library.
-I picked the **random quote generator** and turned it into a pixel fortune teller for designers.
+
+V1 was "The Design Oracle", a quote generator for designers. V2 turns it into **The Fortune Machine**, inspired by the coin-operated weighing machines on Indian railway platforms. You step up, drop a coin, the wheel spins, the machine whirs, and out comes a printed ticket. It doesn't weigh you. It weighs what's on your mind.
 
 ## 🛠️ What I built
 
-An arcade fortune-telling machine starring a pixel wizard who has spent far too long around Figma files and stakeholders.
+- **The machine:** an original pixel-art railway machine drawn as SVG pixel geometry. It has an octagonal head with a ring of chasing bulbs, an illuminated fortune wheel, a name sign, a ₹1 coin slot, a gauge with a moving needle, status lamps, a ticket dispenser and a weighing platform with footprints.
+- **Tikku, the fortune-keeper:** a tiny chai-coloured creature in a railway cap and handlebar mustache, living in the machine's window. One base sprite with 13 animation frames:
+  - **Idle:** breathes, blinks, glances around and occasionally looks smug.
+  - **Coin received:** jumps with a "!" and turns to the mechanism.
+  - **Calculating:** squeezes his eyes shut and pulls a tiny lever. The bulbs flash in time and he breaks a sweat.
+  - **Delivered:** a sly wink for a Roast, a knowing look for Wisdom, star eyes and waving arms for Hype.
+- **The ritual, in about two seconds:** the coin flies into the slot, the machine wakes up, the wheel spins, the printer clicks, and a ticket prints out of the dispenser and lands in front of you.
+- **Collectible tickets:** cream paper with grain, a double vermilion frame, perforated notches, a ticket number, a "From Overthinking → To Work & Ambition" route, a rubber stamp for the fortune type and readable typewriter text.
+- **81 original fortunes,** for everyone, not just designers: 3 topics × 3 tones × 9 each. They're drawn without repeats until a pool runs out, and never the same one twice in a row.
+- **Sound design:** six original Web Audio effects (coin, activation, wheel spin, printer, reveal chime and button click) through one quiet master bus. Sound is muted by default and starts only when you turn it on.
+- **Copy fortune** and **save ticket as a 1080×1080 PNG**.
+- **Pixel confetti** for Hype fortunes.
+- **Accessibility:** keyboard focus rings and screen-reader announcements. With *reduced motion* on, the ticket appears instantly with no animations.
+- **Layouts:** responsive from 390px phones to large desktops. The machine art always snaps to whole device pixels, so it stays crisp.
 
-- **Three kinds of fortunes:** 🔮 **Wisdom** (design truths), 🔥 **Roast** (gentle burns), ⚡ **Boost** (go make something). **Surprise Me** mixes all three.
-- **45 original fortunes**, 15 per category.
-- **No repeats:** a shuffle bag goes through every quote before reshuffling, and never shows the same quote twice in a row.
-- **A pixel-art Oracle** drawn in SVG with 5 expressions: idle (floating and blinking), thinking, wise smile, smug side-eye for roasts, and star-eyed for boosts.
-- **The reveal:** the crystal ball shakes and swirls, pixel particles burst out, and the quote types itself onto a collectible fortune card. It all takes about 1.2 seconds.
-- **Copy quote** to the clipboard, with a fallback if the clipboard is blocked.
-- **Save card as PNG:** a 1080×1080 share image drawn on a canvas, with the Oracle on it.
-- **Optional 8-bit sound** made from scratch with the Web Audio API. It's off by default.
-- **Accessibility:** works with a keyboard, has visible focus rings, announces each fortune to screen readers, and respects *reduced motion* (the fortune appears instantly).
-- Works on desktop and on phones down to 375px wide.
-
-![Sample share card](docs/sample-card.png)
+![Sample ticket](docs/sample-card.png)
 
 ### 8bitcn components used
 
 | Component | Where |
 |---|---|
-| `Button` | Consult the Oracle, Copy, Save PNG, Another |
-| `Card` | The arcade stage and the fortune card |
-| `Badge` | Category label on the fortune card |
-| `ToggleGroup` | Surprise Me / Wisdom / Roast / Boost picker |
+| `ToggleGroup` | "What's weighing on you?" and "Choose your fortune" selectors |
+| `Button` | Insert Coin, Another Fortune, Copy, Save PNG |
 | `Toggle` | Sound on/off |
-| `toast` | "Fortune copied" and "Card saved" messages |
+| `Badge` | The rubber stamp on each ticket |
+| `toast` | Copy and save confirmations |
 
-The components live in `src/components/ui/8bit/`, with the shadcn base components they wrap in `src/components/ui/`.
-`components.json` registers the `@8bitcn` registry, so you can add more components with:
-
-```bash
-pnpm dlx shadcn@latest add @8bitcn/<component>
-```
+The machine and Tikku are custom pixel art. 8bitcn provides the controls.
 
 ## ▶️ How to run it
 
@@ -55,36 +54,38 @@ pnpm install
 pnpm dev
 ```
 
-Then open http://localhost:5173.
+Open http://localhost:5173.
 
-Other scripts: `pnpm build` (type-check and production build), `pnpm lint`, `pnpm test` (shuffle-bag unit tests).
+Other scripts: `pnpm build`, `pnpm lint`, `pnpm test` (shuffle-bag unit tests).
 
 ## 🗂️ Where things are
 
 ```
 src/
-├── App.tsx                      # page layout + reveal state machine
-├── data/fortunes.ts             # all 45 fortunes + category labels, reactions, dialogue
+├── App.tsx                          # layout + the coin → wheel → printer → ticket choreography
+├── data/fortunes.ts                 # 81 fortunes, topics, tones, Tikku's lines
 ├── lib/
-│   ├── pixel-art.ts             # Oracle, crystal ball and icons as pixel grids
-│   ├── shuffle-bag.ts           # no-repeat randomiser
-│   ├── export-card.ts           # 1080×1080 PNG renderer
-│   ├── sound.ts                 # Web Audio chimes
-│   └── clipboard.ts             # copy with fallback
+│   ├── art/machine.ts               # the machine: static body + animated bulbs, wheel, gauge, lamps, lever
+│   ├── art/tikku.ts                 # Tikku's sprite and expressions
+│   ├── art/icons.ts                 # 8×8 panel icons
+│   ├── pixel/grid.ts, font.ts       # tiny pixel-art toolkit and a 3×5 pixel font
+│   ├── sound.ts                     # Web Audio sound effects
+│   ├── export-ticket.ts             # 1080×1080 PNG renderer
+│   └── shuffle-bag.ts               # no-repeat randomiser
 └── components/
-    ├── oracle/                  # stage, fortune card, category picker, sprites
-    └── ui/8bit/                 # 8bitcn components
+    ├── machine/                     # machine, control panel, ticket, coin
+    └── ui/8bit/                     # 8bitcn components
 ```
 
 ## 💡 What I learned
 
-- Drawing pixel art as data (a grid of coloured cells) means one drawing can power both the live SVG and the exported PNG.
-- A shuffle bag makes random feel *fair*: people notice repeats much more than true randomness.
-- Timing is a design material. A 0.7s "thinking" beat before the reveal makes the result feel earned without feeling slow.
+- A ritual beats a result. The same random quote feels far more special when you have to drop a coin and wait for it to print.
+- Pixel art needs whole-pixel scaling. Drawing at a non-whole scale leaves faint seams, so the machine's size snaps to whole device pixels.
+- A character comes alive from reactions, not motion. Tikku barely moves, but he notices the coin, works the lever and reacts to what he printed.
 
 ## 📝 Notes
 
-- The cloud environment I built this in couldn't reach 8bitcn.com, so the components were copied from 8bitcn's official GitHub repo ([TheOrcDev/8bitcn-ui](https://github.com/TheOrcDev/8bitcn-ui)). That is the same thing `shadcn add` does. Two small changes: removed one unused import in `toast.tsx`, and removed the Google Fonts `@import` from `retro.css` because the fonts are bundled locally with Fontsource.
+- The 8bitcn components were copied from 8bitcn's official GitHub repo, because the cloud environment couldn't reach 8bitcn.com. That's the same thing `shadcn add` does. Two small changes: removed one unused import in `toast.tsx`, and removed the Google Fonts `@import` from `retro.css` because fonts are bundled locally.
 - All fortunes are original. None are attributed to real people.
 
 ## 📣 Posts

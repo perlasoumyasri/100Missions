@@ -5,10 +5,10 @@
       "number": 1,
       "slug": "mission-001",
       "dir": "mission-001-design-oracle",
-      "title": "The Design Oracle",
-      "tagline": "An 8-bit fortune teller for designers. Wisdom, roasts and creative boosts.",
+      "title": "The Fortune Machine",
+      "tagline": "An 8-bit railway fortune machine. Insert a coin, watch Tikku work the gears, get a printed ticket.",
       "date": "2026-11-23",
-      "tags": ["React", "Tailwind", "8bitcn", "Pixel art"],
+      "tags": ["React", "8bitcn", "Pixel art", "Web Audio"],
       "thumbnail": "mission-001-design-oracle/docs/preview.png"
     }
   ]

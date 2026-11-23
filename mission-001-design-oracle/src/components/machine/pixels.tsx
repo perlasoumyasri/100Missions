@@ -1,10 +1,14 @@
 import { memo, type SVGProps } from "react"
 
-import { ICONS, type IconName, type Pixel } from "@/lib/pixel-art"
+import { ICONS, type IconName } from "@/lib/art/icons"
+import type { Pixel } from "@/lib/pixel/grid"
 
 /** Merges horizontal runs of same-coloured pixels into single rects. */
 function runs(pixels: Pixel[]) {
-  const sorted = [...pixels].sort((a, b) => a[1] - b[1] || a[0] - b[0])
+  // Later pixels win when two share a cell.
+  const unique = new Map<number, Pixel>()
+  for (const p of pixels) unique.set(p[1] * 10000 + p[0], p)
+  const sorted = [...unique.values()].sort((a, b) => a[1] - b[1] || a[0] - b[0])
   const out: { x: number; y: number; w: number; c: string }[] = []
   for (const [x, y, c] of sorted) {
     const last = out[out.length - 1]
