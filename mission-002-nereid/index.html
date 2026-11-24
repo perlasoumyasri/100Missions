@@ -39,6 +39,17 @@
       <p class="gauge__depth" aria-hidden="true"><span id="depth">0</span> m <span class="gauge__sim">sim.</span></p>
     </nav>
 
+    <!-- The probe's console: its instruments report here, in one fixed place. Each line types out when the
+         story reaches its position (data-at, in chapters) and stays until newer lines replace it. -->
+    <ol class="console" id="console" role="log" aria-label="Probe log">
+      <li data-at="1.57">Landing site identified. Preparing probe.</li>
+      <li data-at="2.69">Ice thinning. Liquid water detected below.</li>
+      <li data-at="3.02">Ice breached. Probe in liquid water.</li>
+      <li data-at="4.36">Thermal anomaly detected · <span data-anomaly-range>4.4 km</span> ahead · simulated</li>
+      <li data-at="5.74">Collecting water samples. Analysing chemical composition.</li>
+      <li data-at="6.47">Transmitting to Earth · signal delay 43&nbsp;min · simulated</li>
+    </ol>
+
     <main>
       <!-- Each chapter answers one question and raises the next. Status lines and actions carry a
            data-window (chapter progress where they appear and leave), so they land on the visual event. -->
@@ -48,7 +59,7 @@
           <p class="kicker">The expedition · Europa, moon of Jupiter</p>
           <h1 class="title" id="t-1" data-kinetic="slices">NEREID</h1>
           <p class="tagline" data-kinetic="fade">What is hiding beneath Europa's ice?</p>
-          <div class="callout callout--gold" data-at="europa" data-span="intro,0.6" data-slot="0.655,0.4,-1,1,0.3">
+          <div class="callout callout--gold" data-at="europa" data-span="intro,0.88" data-slot="0.655,0.4,-1,1,0.3">
             <span class="callout__mark" aria-hidden="true"></span><span class="callout__leg" aria-hidden="true"></span>
             <p class="callout__text"><span class="callout__line">From space, Europa looks frozen in time.</span><span class="callout__line">But its surface has puzzled scientists for decades.</span></p>
           </div>
@@ -67,7 +78,6 @@
             <span class="callout__mark" aria-hidden="true"></span><span class="callout__leg" aria-hidden="true"></span>
             <p class="callout__text"><span class="callout__line">Jupiter's pull bends and breaks this ice.</span><span class="callout__line">Some of these cracks may carry material up from below.</span></p>
           </div>
-          <p class="status" data-kinetic="transmit" data-window="0.57,0.65">Landing site identified. Preparing probe.</p>
         </div>
       </section>
 
@@ -80,7 +90,6 @@
             <p class="callout__text"><span class="callout__line">Our probe melts its way down.</span><span class="callout__line">Above us, the sunlight is already gone.</span></p>
           </div>
           <p class="readout" aria-hidden="true"><span id="shaft-depth">0</span><span class="readout__unit">m below the surface · simulated</span></p>
-          <p class="status" data-kinetic="transmit" data-window="0.69,0.76,0.97,1.02">Ice thinning. Liquid water detected below.</p>
         </div>
       </section>
 
@@ -122,7 +131,6 @@
             <span class="callout__mark" aria-hidden="true"></span><span class="callout__leg" aria-hidden="true"></span>
             <p class="callout__text"><span class="callout__line callout__data">Hydrothermal vent · T&nbsp;+11&nbsp;°C · chemical gradient · simulated</span><span class="callout__line">Around vents like these on Earth, whole ecosystems live in darkness, fed by chemistry, not sunlight.</span></p>
           </div>
-          <p class="status" data-kinetic="transmit" data-window="0.74,0.82,0.99,1.03">Collecting water samples. Analysing chemical composition.</p>
         </div>
       </section>
 
@@ -137,7 +145,6 @@
           <div class="act" data-window="0.26,0.29,0.4,0.45">
             <button class="cta" type="button" data-go="6.8">Transmit findings <span class="cta__glyph" aria-hidden="true"></span></button>
           </div>
-          <p class="transmit" data-kinetic="transmit" data-window="0.47,0.57">Transmitting to Earth · signal delay 43 min · simulated</p>
           <p class="narrative narrative--close" data-window="0.81,0.84">The next mission will know exactly where to look.</p>
           <svg class="diagram" viewBox="0 0 400 400" aria-hidden="true">
             <g class="diagram__rays"></g>

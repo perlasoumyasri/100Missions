@@ -7,7 +7,8 @@ import { hexLinear } from "./ocean/tuning";
 import type { FrameInfo, FrameParams, OceanRenderer } from "./ocean/renderer";
 import { createSound, type CueId } from "./sound";
 import { buildAt, buildStages, CLOCK_PACE, layoutCallout, readTime, schedule, SCROLL_PACE, wordAt, type Line, type Slot } from "./type/callouts";
-import { apply, split, typed, type Mode, type Split } from "./type/kinetic";
+import { apply, split, type Mode, type Split } from "./type/kinetic";
+import { createConsole } from "./type/console";
 
 const $ = <T extends Element = HTMLElement>(s: string) => document.querySelector<T>(s)!;
 const reducedQuery = matchMedia("(prefers-reduced-motion: reduce)");
@@ -332,7 +333,6 @@ function handle(events: StoryEvent[]): void {
     } else if (ev.type === "pulse") sound.cue("sonar-emit");
     else if (ev.type === "anomaly") {
       sound.cue("anomaly-lock");
-      announce(`Thermal anomaly detected, ${anomalyKm} kilometres ahead. Simulated reading.`, 200);
     }
   }
 }
@@ -386,7 +386,7 @@ const calloutViewport = () => {
   const h = innerHeight;
   const phone = w < 700;
   // The chapter gauge owns the right edge on wide screens; the masthead and fine print own top and bottom.
-  return { w: w - (w > 900 ? 130 : 0), h, gutter: Math.min(96, Math.max(20, w * 0.052)), top: phone ? 72 : 86, bottom: phone ? 100 : 76, phone };
+  return { w: w - (w > 900 ? 130 : 0), h, gutter: Math.min(96, Math.max(20, w * 0.052)), top: phone ? 72 : 86, bottom: phone ? 180 : 140, phone }; // the console owns the bottom left
 };
 
 /**
@@ -455,8 +455,8 @@ function updateCallouts(f: Frame, lp: number, targets: Anchors["targets"], openi
   }
 }
 
-/** Letters struck so far on each teleprinter line, so each new one ticks once. */
-const struck = new Map<Split, number>();
+/** The probe's console (bottom left): the instruments' lines type out there, with a tick per letter. */
+const probeConsole = createConsole($("#console"), () => sound.tick());
 
 function overlay(p: number, depthM: number, a: Anchors): void {
   const reduced = story.reducedMotion;
@@ -489,7 +489,7 @@ function overlay(p: number, depthM: number, a: Anchors): void {
       setVar(f.el, "--act", smooth(OPENING.begin[0], OPENING.begin[1], openingT).toFixed(3));
       k = smooth(TITLE[0], TITLE[1], it);
       inEnv = smooth(TITLE[1], TITLE[1] + 0.5, openingT);
-      out = smooth(0.55, 0.92, lp);
+      out = smooth(0.8, 0.98, lp);
     } else {
       // First Contact waits for the breakthrough: the ocean is never announced before it is seen.
       const start = i === 3 ? 0.08 : 0;
@@ -521,12 +521,6 @@ function overlay(p: number, depthM: number, a: Anchors): void {
       if (i === 0 && mode === "fade") kk = reduced ? 1 : smooth(OPENING.question[0], OPENING.question[1], openingT);
       if (last && mode === "fade") kk = smooth(0.02, 0.2, lp);
       apply(mode, s, { k: kk, out: o, reduced });
-      // The teleprinter strikes: one soft tick for each letter that lands (only while typing forward).
-      if (mode === "transmit") {
-        const n = typed(kk, s.chars.length);
-        if (n > (struck.get(s) ?? 0) && o === 0 && !reduced) sound.tick();
-        struck.set(s, n);
-      }
     }
     updateCallouts(f, lp, a.targets, openingT);
     if (last) {
@@ -535,6 +529,8 @@ function overlay(p: number, depthM: number, a: Anchors): void {
       lastDraw = draw;
     }
   });
+
+  probeConsole.update(p, story.time, reduced);
 
   // Gauge, depth and readouts.
   const current = Math.min(CHAPTERS - 1, Math.floor(p));
@@ -574,7 +570,7 @@ addEventListener("focusin", () => (hurried = true), { once: true });
 /** NEREID forms over these seconds of the intro clock: slow, so each slice of light can be watched. */
 const TITLE: readonly [number, number] = [4.6, 8.4];
 /** Scrolling moves the opening clock on: one second of it for every 6vh of scroll. */
-const VH_PER_SECOND = 6;
+const VH_PER_SECOND = 8;
 /**
  * After the name (seconds on the opening clock): the question, then the Europa callout once the question
  * has been read, its lines one by one, then the first action once the last line has been read.

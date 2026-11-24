@@ -4,14 +4,13 @@
  *   slices   (the NEREID title)  each letter forms from horizontal slices of light that widen until solid
  *   fade     (headings)          the words come up in place: no movement, no wipe (the user found entrances
  *                                that move or wipe "like a presentation animation")
- *   transmit (status lines)      the line types out like a signal; on the way back it disintegrates
  */
 
-export type Mode = "slices" | "fade" | "transmit";
+export type Mode = "slices" | "fade";
 
 export interface Split {
   el: HTMLElement;
-  /** Letters (slices, transmit); empty for fade. */
+  /** Letters (slices); empty for fade. */
   chars: HTMLElement[];
   /** Per-character random seeds, stable across frames. */
   seeds: number[];
@@ -21,7 +20,6 @@ export interface Split {
 const SPLIT: Record<Mode, boolean> = {
   slices: true,
   fade: false,
-  transmit: true,
 };
 
 export function split(el: HTMLElement, mode: Mode): Split {
@@ -91,9 +89,6 @@ const put = (el: HTMLElement, css: string) => {
   el.style.cssText = css;
 };
 
-/** How many letters of a teleprinter line of `n` letters have struck at progress `k`. */
-export const typed = (k: number, n: number) => Math.min(n, Math.floor(clamp01(k) * n * 1.15));
-
 export function apply(mode: Mode, s: Split, c: Context): void {
   const n = s.chars.length;
   if (c.reduced) {
@@ -124,30 +119,6 @@ export function apply(mode: Mode, s: Split, c: Context): void {
       // In place: only opacity, eased, so the words simply come up with the scroll.
       const t = c.k * c.k * (3 - 2 * c.k);
       put(s.el, `opacity:${(t * (1 - c.out)).toFixed(3)}`);
-      return;
-    }
-    case "transmit": {
-      put(s.el, "");
-      // A teleprinter: each letter strikes on at once and flashes bright as it lands, settling to the
-      // line's colour over the next two letters; a block cursor waits where the next letter will strike.
-      // Scrolling back past it, the letters drift up and dissolve like a signal breaking.
-      const shown = typed(c.k, n);
-      const typing = c.k > 0 && c.k < 1 && c.out === 0;
-      s.chars.forEach((ch, i) => {
-        const lead = shown - i;
-        const seed = s.seeds[i]!;
-        const d = clamp01(c.out * 1.6 - seed * 0.6);
-        if (typing && i === shown) {
-          put(ch, "opacity:1;color:transparent;background:var(--cursor)");
-          return;
-        }
-        const on = lead > 0 ? 1 : 0;
-        const flash = c.out === 0 && lead > 0 ? clamp01(1 - (lead - 1) / 2) : 0;
-        put(
-          ch,
-          `opacity:${(on * (1 - d)).toFixed(3)};--f:${flash.toFixed(2)};transform:translate(${((seed - 0.5) * 60 * d).toFixed(1)}px,${(-80 * d * (0.5 + seed)).toFixed(1)}px);${blur(d * 8)}`,
-        );
-      });
       return;
     }
   }
