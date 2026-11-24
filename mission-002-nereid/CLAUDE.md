@@ -35,7 +35,23 @@ The user asked for a final, showable version: no lag, human scroll pacing, gradu
   - Status lines (Plex Mono, typed out) and actions carry `data-window="a,b[,c,d]"` (chapter progress), so they land on the visual event: landing site at P 1.52, liquid water just before the breakthrough, samples at the vents. First Contact's text waits for the breakthrough.
   - The action buttons (`.cta[data-go]`) glide the scroll to the next discovery over 1.6–4.5 s, so the sonar sweep and the signal play out; any wheel, touch or key cancels the glide.
   - The Transmission signal now leaves at P 6.45–6.75 (after "Transmit findings"). Europa holds the right of the frame (the top on portrait) through the pull-back.
-- **Next:** the user reviews, then shipping to Vercel (ship-mission skill: README, missions.json, build into site/, commit, push as perlasoumyasri), only once the user confirms.
+- **Round 5 (committed as 41dc97e, then this interim sound change):** the user found the procedural sound "very bad", not cinematic, not cohesive, and the noise layers during the zoom "like disturbance". Every noise layer (ambience beds, traversal hiss, ice ticks) was removed; `src/sound.ts` now plays only short tonal cues on the key events (levels measured: UI about −22, key moments −19 to −12 dBFS). The dev audition panel was removed. Sound is **on by default** as a remembered preference (`localStorage` "nereid-sound"); audio starts at the first click, tap or key press, since browsers allow nothing earlier.
+- **Next (start in a fresh session; this one ran very long):**
+  1. **Narrative as callouts, not a text column.** The user: the headline animation is good, but the paragraph text animation is bad, and a stacked column on one side is hard to read ("people won't read everything"). Replace each chapter's `.narrative` paragraphs with one or two short callouts pinned to things in the scene. Each callout has a thin engraved leader line, Golden Record style: hairline, gold or ice, a small tick or circle at the target end. It appears in sequence (the line draws, then the words), using the existing anchor projection (`projectSpace` / `ocean.project`) and `data-window` timing. Callouts are not plain fades; give each a soft cue when it lands. Targets:
+     - Opening: Europa ("Scientists believe there is a vast ocean beneath this frozen moon…").
+     - Arrival: the ice, then the reddish crack (`DIVE_POINT`).
+     - Descent: the probe's lamp at the shaft centre.
+     - First Contact: the probe lights and the dark water.
+     - Anomaly: the warm region (`ANOMALY`).
+     - Discovery: the vent (`VENT`).
+     - Transmission: Europa, then Earth (`EARTH_DIR`).
+     Keep the headline, status lines and CTAs as they are. Copy stays as in copy.md, split into callout-sized lines without changing words. Check AA contrast over the scene. On phones, callouts stack under their marker. Keep an accessible text order (sr-only copy of each chapter).
+  2. **Real sound, not synthesis.** The limitation: Claude can't hear, so procedural sound was designed blind. Use generated or recorded assets the user can audition:
+     - ElevenLabs sound effects. The claude.ai ElevenLabs connector must be authorised first; it was unavailable in this session.
+     - Or public-domain NASA audio.
+     - Or CC0 clips (record licences in README).
+     Needed: a space bed, an ice-descent bed, an ocean bed, the breakthrough, a sonar ping with returns, the anomaly lock, a vent warmth swell, the transmission pulses, UI confirms. Load lazily after the first gesture, crossfade beds from the director's world weights, keep the sound-design.md mixing targets, and let the user audition before integrating.
+  3. Then shipping to Vercel (ship-mission skill: README, missions.json, build into site/, commit, push as perlasoumyasri), only once the user confirms.
 
 ## Skills
 

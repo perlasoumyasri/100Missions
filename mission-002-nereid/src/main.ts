@@ -193,10 +193,26 @@ $("#replay").addEventListener("click", () => {
   sound.cue("reset");
   replayAt = story.time;
 });
-$("#sound").addEventListener("click", async () => {
-  const on = await sound.toggle();
-  $("#sound").setAttribute("aria-pressed", String(on));
-  $("[data-sound-state]").textContent = on ? "on" : "off";
+// Sound is on by default (a remembered preference). Browsers allow no audio before a gesture, so it
+// starts at the visitor's first click, tap or key press; the Sound button turns it off and on.
+const soundButton = $("#sound");
+let wantSound = localStorage.getItem("nereid-sound") !== "off";
+const showSound = () => {
+  soundButton.setAttribute("aria-pressed", String(wantSound));
+  $("[data-sound-state]").textContent = wantSound ? "on" : "off";
+};
+showSound();
+const startSound = (e: Event) => {
+  if (!wantSound || sound.enabled || soundButton.contains(e.target as Node)) return;
+  void sound.enable();
+};
+for (const ev of ["pointerdown", "keydown", "touchend"] as const) addEventListener(ev, startSound, { passive: true });
+soundButton.addEventListener("click", () => {
+  wantSound = !wantSound;
+  localStorage.setItem("nereid-sound", wantSound ? "on" : "off");
+  showSound();
+  if (wantSound) void sound.enable(true);
+  else sound.disable();
 });
 
 const pointer = { x: 0, y: 0, sx: 0, sy: 0 };
@@ -444,7 +460,6 @@ function frameParams(info: FrameInfo): FrameParams {
   const aspect = info.width / Math.max(1, info.height);
   const shot = shoot(p, elapsed, aspect, introProgress());
   positionCues(p);
-  sound.update({ ...shot.weights, warm: shot.plume, signal: shot.signal }, story.speed);
   oceanTime += dt * (story.reducedMotion ? 0.12 : 0.6);
 
   // Ocean camera with gentle pointer parallax.
@@ -582,8 +597,3 @@ async function boot(): Promise<void> {
 }
 
 void boot();
-
-// Development only: the four-button sound audition panel (sound-design.md §9). Tree-shaken from builds.
-if (import.meta.env.DEV && new URLSearchParams(location.search).has("audition")) {
-  void import("./audition").then((m) => m.mountAudition(sound));
-}
