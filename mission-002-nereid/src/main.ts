@@ -276,8 +276,10 @@ const soundButton = $("#sound");
 let wantSound = localStorage.getItem("nereid-sound-on") !== "off";
 // The button tells the truth: browsers allow no sound until a click, tap or key press (scrolling doesn't
 // count), so until then it says "tap to start" rather than "on".
+const soundHint = $("#sound-hint");
 const showSound = () => {
   const playing = wantSound && sound.enabled;
+  if (playing) soundHint.hidden = true;
   soundButton.setAttribute("aria-pressed", String(playing));
   $("[data-sound-state]").textContent = playing ? "on" : wantSound ? "tap to start" : "off";
 };
@@ -287,6 +289,14 @@ const startSound = (e: Event) => {
   void sound.enable().then(showSound);
 };
 for (const ev of ["pointerdown", "keydown", "touchend"] as const) addEventListener(ev, startSound, { passive: true });
+// Scrolling can't start audio, so a visitor who only scrolls is told, once, how to turn it on.
+addEventListener(
+  "scroll",
+  () => {
+    if (wantSound && !sound.enabled && scrollY > innerHeight * 0.3) soundHint.hidden = false;
+  },
+  { passive: true },
+);
 soundButton.addEventListener("click", () => {
   // Wanted but not started yet: this click starts it. Otherwise the button toggles.
   if (wantSound && !sound.enabled) return void sound.enable(true).then(showSound);

@@ -1093,3 +1093,30 @@ em {
     letter-spacing: 0.02em;
   }
 }
+
+/* Shown once if the visitor scrolls without a click: browsers start audio only on a click, tap or key. */
+.sound-hint {
+  position: fixed;
+  top: calc(var(--top) + 84px);
+  left: 50%;
+  z-index: 5;
+  transform: translateX(-50%);
+  margin: 0;
+  padding: 8px 16px;
+  border: 1px solid rgb(227 184 102 / 0.6);
+  border-radius: 999px;
+  background: rgb(20 14 7 / 0.85);
+  font-family: var(--sans);
+  font-size: var(--fs-essential);
+  color: #e3b866;
+  white-space: nowrap;
+  pointer-events: none;
+}
+.sound-hint[hidden] {
+  display: none;
+}
+@media (max-width: 699px) {
+  .sound-hint {
+    top: calc(var(--top) + 66px);
+  }
+}

@@ -71,7 +71,10 @@ export function buildEngine(ctx: AudioContext) {
   limiter.ratio.value = 12;
   limiter.attack.value = 0.003;
   limiter.release.value = 0.25;
-  master.connect(limiter).connect(ctx.destination);
+  // +6 dB of make-up after the limiter: laptop speakers need it (the user heard nothing at the levels below).
+  const makeup = ctx.createGain();
+  makeup.gain.value = dB(6);
+  master.connect(limiter).connect(makeup).connect(ctx.destination);
 
   const filter = ctx.createBiquadFilter();
   filter.type = "lowpass";
@@ -195,18 +198,24 @@ export function buildEngine(ctx: AudioContext) {
         duck.gain.setTargetAtTime(1, at + length * 0.5, 0.6);
       }
     },
-    /** One teleprinter strike: a soft key tick, a little different in pitch each time, at most every 35 ms. */
+    /**
+     * The console typing: a soft, low, filtered tick, at most about eight a second, well under the beds.
+     * (The user found a tick per letter "like heavy machinery": it must be subtle and peaceful.)
+     */
     tick() {
       const s = samples.get("13-type-tick");
       const at = ctx.currentTime;
-      if (!s || at - lastTick < 0.035) return;
+      if (!s || at - lastTick < 0.12) return;
       lastTick = at;
       const src = ctx.createBufferSource();
       src.buffer = s.buffer;
-      src.playbackRate.value = 0.92 + Math.random() * 0.16;
+      src.playbackRate.value = 0.82 + Math.random() * 0.08;
+      const soft = ctx.createBiquadFilter();
+      soft.type = "lowpass";
+      soft.frequency.value = 2200;
       const g = ctx.createGain();
-      g.gain.value = levelTo(s.lufs, -26);
-      src.connect(g).connect(master);
+      g.gain.value = levelTo(s.lufs, -40);
+      src.connect(soft).connect(g).connect(master);
       src.start(at, s.onset);
     },
     fadeTo(level: number, seconds = 0.25) {
