@@ -15,7 +15,7 @@ Only ship when the user asks. Run the `visual-quality` review first.
 4. **Root `learnings.md`:** add anything reusable this mission taught (libraries, prompting techniques, animation approaches, implementation tricks), in the format at the top of that file.
 5. **Mission `CLAUDE.md`:** set the status to shipped with the date and live link.
 6. **Build:** `npm run build` at the repo root must succeed. Spot-check `dist/mission-NNN/` with `npm run preview`.
-7. **Commit** with the message style `Mission NNN: <what changed>`. Push only when the user asks, as `perlasoumyasri` (check `gh auth status`, and tell the user before switching the active account).
+7. **Commit** with the message style `Mission NNN: <what changed>`. Push only when the user asks, as `perlasoumyasri` (see Git in the root CLAUDE.md).
 
 ## Build contract
 

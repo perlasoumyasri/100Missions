@@ -48,7 +48,7 @@ The user directs each mission. **Only do the phase the user asks for.** A brief 
 
 ## Git
 
-The repo is `perlasoumyasri/100Missions`. Commit as `Mission NNN: <what changed>`. Push only when the user asks, as `perlasoumyasri`: check `gh auth status`, because this Mac has two accounts.
+The repo is `perlasoumyasri/100Missions`. Commit as `Mission NNN: <what changed>`. Push only when the user asks, and only as `perlasoumyasri`. Never as `anudeep108`, the other (active) `gh` account on this Mac. Don't switch accounts. Push with `GH_TOKEN="$(gh auth token --user perlasoumyasri)" git push origin main`.
 
 ## Writing
 
