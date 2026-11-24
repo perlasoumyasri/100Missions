@@ -1,130 +1,93 @@
 # Mission 002: NEREID
 
-Instructions for working on this mission. They add to the root `CLAUDE.md` and override it on anything creative (style, stack, interactions). The root engineering standards still apply.
+Rules and current facts for this mission. They add to the root `CLAUDE.md` and override it on anything creative (style, stack, interactions); the root engineering standards still apply. History lives in `git log`, not here: when something changes, update the fact in place instead of appending a log entry.
 
 ## Read first
 
 1. [brief.md](brief.md): what we're making and why.
-2. [art-direction.md](art-direction.md): how it looks, moves and feels. Sections 01–08 are the user's direction (04b, the type system, overrides 04); 09 is the build decisions.
-3. [design.md](design.md): the user's content, composition, states and acceptance criteria. It supersedes the brief's copy.
-4. [copy.md](copy.md): the user's expedition copy (2026-11-24). It supersedes design.md's copy.
-5. [sound-design.md](sound-design.md): the user's sound direction.
-6. [references/README.md](references/README.md): when making visual decisions.
+2. [art-direction.md](art-direction.md): how it looks, moves and feels. 01–08 are the user's direction (04b, the type system, overrides 04).
+3. [copy.md](copy.md): the user's expedition copy. It supersedes the copy in design.md and the brief.
+4. [design.md](design.md): composition, states and acceptance criteria.
+5. [storyboard.md](storyboard.md): the chapters, beats and measured pacing. Read before changing the story or timing.
+6. [sound-design.md](sound-design.md): the user's sound direction.
+7. [references/README.md](references/README.md): when making visual decisions.
 
 ## Status
 
-- **Phase:** Quality pass (v4: polish after the user's review of v3) <!-- Brief → Art direction → Discovery → Build → Quality pass → Shipped -->
-- **Next step:** The user reviews v4 (see Current state).
+- **Phase:** Shipped 2026-11-24, https://100-missions.vercel.app/mission-002/ <!-- Brief → Art direction → Discovery → Build → Quality pass → Shipped -->
+- **After shipping:** any code change needs `npm run build:mission -- 2` from the repo root, and the rebuilt `site/mission-002/` committed. The sound defaults were picked blind from measurements; the user may still swap takes at `/audition/` (dev only, git-ignored; regenerate on the ElevenLabs flow "NEREID sound candidates", `i9JbN71N8g0txDbtm4Rs`).
 
 Only work on the phase the user asks for.
 
-## Current state (2026-11-24, v4: polish round)
+## How it works now
 
-The user asked for a final, showable version: no lag, human scroll pacing, gradual changes in speed, and fixes to the type. Done and verified:
-
-- **Fonts:** Bodoni now loads its `opsz` (display) files; before, it used the text cut. The tagline is Plex Sans. Bodoni is for the title and headlines only.
-- **NEREID** forms from horizontal slices of light again (the user's favourite), now smooth: no stepping, and the mask is dropped once a letter is whole.
-- **Arrival** uses a focus pull instead of animated tracking, so the lines never re-wrap. Condense letters settle close to their place instead of scattering.
-- **Pacing:** see storyboard.md "Pacing". Measured with a motion profile; there is no dead stretch, the approach zooms in place, the dive is slow, the shaft speeds up and slows down, and the rewind is a clean dissolve.
-- **Opening:** Jupiter (lit, at SUN×60) → Europa; the title clears the moon at 1280, 1440 and 1920 (camera at distance 12, aim −2.8). The intro clock waits for fonts (at most 2.5 s).
-- **Audit applied:** the sonar reveal only grows; no layout reads in the frame loop (gauge, splits and rects are measured at boot, on resize (debounced) and when fonts load); `gpu.lost` → fallback; debounced graph rebuilds; chapter links and the skip link land on a formed frame and move focus; faded frames are `inert`; focus returns to #begin after replay; sr-only text instead of `aria-label` on `<p>`; queued announcements; WGSL `sq()` instead of `pow(x, 2.0)`; the diagram is a fixed 400 px scaled by transform, and the outer ring is excluded from the draw-on; custom properties are written only on change; the renderer import runs in parallel with the adapter request; Arrival and Fracture have a text-side shade for AA contrast.
-- **Measured:** paced scroll at 2× DPR: 0 frames over 50 ms, max 16.8 ms, tier stays medium (before: 12 frames over 50 ms and a drop to low). tsc, 20 tests and `vite build --base=/mission-002/` pass. Reduced motion and the no-WebGPU fallback were checked; the stills were regenerated.
-- **Round 2 (same day):** headlines and the closing question at weight 600 (more presence); "or scroll" in Plex Sans beside the CTA; modes that move whole lines or words no longer split letters (letter boxes broke Bodoni's kerning, e.g. "dow n"). **The sonar is scroll-driven** (`SWEEP` and `sweepRadius` in story.ts): the ring spreads as the visitor scrolls from the end of First Contact into The Anomaly, holds when they stop, and gathers back on the way up, then one small settle ripple; there's one ping per dive and no timed re-pings. **Sound** per the user's sound-design.md: `src/sound.ts` (procedural Web Audio; buses → limiter; world beds crossfaded from the director's weights; traversal texture from the spring's velocity; ten cues on real events, with hysteresis) and a dev-only audition panel (`?audition`, not in builds). Levels were measured offline against the doc's dBFS targets; nobody has listened yet. **`QualityGovernor`** steps down a tier only if that actually helps; under Chrome's battery 30 fps cap it restores the tier.
-- **Round 3:** the user found the NEREID reveal "sped up" and not immersive. The title now forms over 3.8 s of the intro clock (`TITLE` in main.ts: about 2.2 s per letter, staggered), with the tagline after it and the narrative and CTA last. Scrolling or keys early only hurry the Jupiter travel (3×, was 5× for everything); the title is never sped up. The camera spring is OMEGA 5.5 (was 7): a little more weight, settling in about 0.85 s. The `.cta` buttons are engraved Golden Record gold (brushed plate, lit gold frame, one glint on hover or focus; label contrast 10.8:1), from the user's Voyager record reference.
-- **Round 4, the copy (copy.md):** the chapters are now The Mystery, Arrival, The Descent, First Contact, The Anomaly, The Discovery and The Transmission. NEREID still forms first; the mystery question is the Opening tagline.
-  - Status lines (Plex Mono, typed out) and actions carry `data-window="a,b[,c,d]"` (chapter progress), so they land on the visual event: landing site at P 1.52, liquid water just before the breakthrough, samples at the vents. First Contact's text waits for the breakthrough.
-  - The action buttons (`.cta[data-go]`) glide the scroll to the next discovery over 1.6–4.5 s, so the sonar sweep and the signal play out; any wheel, touch or key cancels the glide.
-  - The Transmission signal now leaves at P 6.45–6.75 (after "Transmit findings"). Europa holds the right of the frame (the top on portrait) through the pull-back.
-- **Round 5 (committed as 41dc97e, then this interim sound change):** the user found the procedural sound "very bad", not cinematic, not cohesive, and the noise layers during the zoom "like disturbance". Every noise layer (ambience beds, traversal hiss, ice ticks) was removed; `src/sound.ts` now plays only short tonal cues on the key events (levels measured: UI about −22, key moments −19 to −12 dBFS). The dev audition panel was removed. Sound is **on by default** as a remembered preference (`localStorage` "nereid-sound"); audio starts at the first click, tap or key press, since browsers allow nothing earlier.
-- **Next (start in a fresh session; this one ran very long):**
-  1. **Narrative as callouts, not a text column.** The user: the headline animation is good, but the paragraph text animation is bad, and a stacked column on one side is hard to read ("people won't read everything"). Replace each chapter's `.narrative` paragraphs with one or two short callouts pinned to things in the scene. Each callout has a thin engraved leader line, Golden Record style: hairline, gold or ice, a small tick or circle at the target end. It appears in sequence (the line draws, then the words), using the existing anchor projection (`projectSpace` / `ocean.project`) and `data-window` timing. Callouts are not plain fades; give each a soft cue when it lands. Targets:
-     - Opening: Europa ("Scientists believe there is a vast ocean beneath this frozen moon…").
-     - Arrival: the ice, then the reddish crack (`DIVE_POINT`).
-     - Descent: the probe's lamp at the shaft centre.
-     - First Contact: the probe lights and the dark water.
-     - Anomaly: the warm region (`ANOMALY`).
-     - Discovery: the vent (`VENT`).
-     - Transmission: Europa, then Earth (`EARTH_DIR`).
-     Keep the headline, status lines and CTAs as they are. Copy stays as in copy.md, split into callout-sized lines without changing words. Check AA contrast over the scene. On phones, callouts stack under their marker. Keep an accessible text order (sr-only copy of each chapter).
-  2. **Real sound, not synthesis.** The limitation: Claude can't hear, so procedural sound was designed blind. Use generated or recorded assets the user can audition:
-     - ElevenLabs sound effects. The claude.ai ElevenLabs connector must be authorised first; it was unavailable in this session.
-     - Or public-domain NASA audio.
-     - Or CC0 clips (record licences in README).
-     Needed: a space bed, an ice-descent bed, an ocean bed, the breakthrough, a sonar ping with returns, the anomaly lock, a vent warmth swell, the transmission pulses, UI confirms. Load lazily after the first gesture, crossfade beds from the director's world weights, keep the sound-design.md mixing targets, and let the user audition before integrating.
-  3. Then shipping to Vercel (ship-mission skill: README, missions.json, build into site/, commit, push as perlasoumyasri), only once the user confirms.
-
-## Skills
-
-- `.claude/skills/vgpu/`: the official vgpu agent skill (`npx skills add vercel-labs/vgpu`, pinned in `skills-lock.json`). It routes to the docs bundled with the installed package: `./node_modules/.bin/vgpu docs find <topic>`.
+- **Story:** seven chapters: The Mystery, Arrival, The Descent, First Contact, The Anomaly, The Discovery, The Transmission. Scroll position maps to a story position P (0–7) from each section's measured top and height; chapter lengths are `--len` in index.html (150, 170, 190, 150, 170, 140, 180 vh; First Contact and The Anomaly were lengthened so their lines and actions can be read in turn). A critically damped spring (OMEGA 5.5, settling in about 0.85 s) smooths P. The beats (approach, dive, ice, shaft, rewind) are `BEATS` in director.ts; the measured pacing is in storyboard.md.
+- **Opening:** a time-based intro: Jupiter, "Nearly 800 million kilometres from the Sun.", then Europa, then NEREID forms from slices of light over 3.8 s (`TITLE` in main.ts). An early scroll or key press only hurries the Jupiter travel; the title is never sped up. The intro clock waits for fonts (at most 2.5 s).
+- **Type:** text changes only with the scroll (`kinetic.ts`). NEREID forms from slices of light. Headings come up in place (`fade`: opacity only, no movement, no wipe; the user found the blur, scatter, rising lines and wipes "like a presentation animation"). Status lines type out (`transmit`). A no-break space keeps the readings' units together.
+- **Narrative:** little text, by the user's request: one short callout per chapter (`.callout` in index.html, layout in `src/type/callouts.ts`). **The words sit in a fixed slot** (`data-slot="x,y,side,up,phoneTop"`: the shelf corner as viewport fractions, which side and direction the words hang, and on phones the top of the words); they never flip or move, and only the leader follows the target. It builds with the scroll from its `data-span` start: ring, leader, shelf, then **its lines one at a time** (one sentence per `.callout__line`), each waiting for the one before to be read: 4vh plus 0.9vh per word (a reading counts as four words), `SCROLL_PACE` and `schedule` in type/callouts.ts. The words come up in place (no wipe). It stays until the chapter hands over (span ends at 0.97) and fades with the heading; scrolling back reverses it. If its target leaves the screen, the leader holds its last position. The Opening runs on its own clock after the name (`OPENING` in main.ts, `CLOCK_PACE`, seconds; scrolling moves it on at 6vh a second): the label, the question, the callout's two lines, then Begin expedition, each after the one before has been read (about 17 s in all). Gold in space, ice in the shaft and the ocean, warm on the anomaly and the vent (whose callouts carry the readings). A dark plate behind the words keeps AA contrast over bright ice. Reduced motion and the no-WebGPU fallback show the callouts static in the text column. The crack's "Landing site" marker was removed (it read as a second callout). The copy follows copy.md ("On the site"): controlled revelation, nothing named before the visitor reaches it, each chapter ending on an open observation.
+- **Synced copy:** status lines and actions carry `data-window="a,b[,c,d]"` (chapter progress) so they land on the visual event. The ocean is never announced before the breakthrough. The action buttons (`.cta[data-go]`) glide the scroll over 1.6–4.5 s, and any wheel, touch or key cancels the glide.
+- **Sonar:** scroll-driven (`SWEEP` and `sweepRadius` in story.ts). The ring grows as the visitor scrolls into The Anomaly, holds when they stop, and gathers back on the way up. One ping per dive. 1 world unit = 25 m.
+- **Sound:** ElevenLabs Sound Effects v3 takes (`public/sound/`, 1.3 MB), loaded only after the first click, tap or key press (usually "Begin expedition"). The opening from Jupiter to Europa is silent, by the user's choice (an entry step asking for sound was tried and rejected). The beds' first start rises from −30 dB to full level over 6 s (`rise`, on the beds only: the click's confirmation plays at once, and loads first). Beds sit at −29 to −28 LUFS and keep 1.8 kHz of top end at rest, so laptop speakers play them; measured output after Begin expedition: the confirmation at once, then the background settling near −29 dBFS RMS. Three looping beds (space, ice, ocean) follow the director's world weights with equal-power crossfades, and all draw back to near-silence just before the breakthrough (`bedGains`). While the camera moves, the beds open (low-pass 1.8 → 6 kHz, +2 dB) from the spring's speed, settling in about a second (`motion`), so wheel notches never pump the sound. One-shots fire only on the story's events (`POSITION_CUES` in main.ts: landing site, breakthrough, vent, transmission; the sonar and anomaly events; the buttons), each started past its take's silent lead-in (`onsetSeconds`) so the sound lands on the beat; big cues dip the beds 2–4 dB, gently (0.25 s), never a cut. Each take is levelled from its measured LUFS to a per-cue target; a limiter guards the master. The landing-site lock is the anomaly's two tones played a tone lower (the motif). On by default as a remembered preference (`localStorage` "nereid-sound-on"); suspends when the tab is hidden.
+- **Quality:** tiers (`quality.ts`) cap the scene's DPR and render scale; the space world renders smaller by tier. `QualityGovernor` steps down only when that actually helps, and restores the tier under a frame-rate cap (Chrome's battery saver holds pages at 30 fps). Last clean measurement (before the Instrument Sans change): a paced scroll at 2× DPR had 0 frames over 50 ms and the tier stayed medium. A later run on a loaded machine dipped, but the committed version measured worse under the same load, so remeasure on an idle machine.
+- **Accessibility:** frames that have faded out are `inert`. Chapter links and the skip link land on a formed frame and move focus. Announcements are queued. Text-side shades keep AA contrast over the bright ice. Reduced motion holds a still pose per chapter.
 
 ## Stack
 
-- **Framework / rendering:** Vite + TypeScript, no UI framework. WebGPU through vgpu.
-- **Key libraries:** `vgpu` 0.6 (runtime), `@vgpu/wgsl` (Vite loader for `.wgsl` imports), Fontsource (Bodoni Moda variable with optical size, IBM Plex Sans, IBM Plex Mono).
-- **Package manager:** pnpm (`npx --yes pnpm@10.28.0` if pnpm isn't installed).
-- **Build for the site:** Vite default (`tsc -b` + `vite build --base=/mission-002/`). Public assets use relative paths.
-
-## Commands
+- Vite + TypeScript, no UI framework. WebGPU through `vgpu` 0.6 (runtime) and `@vgpu/wgsl` (the `.wgsl` loader).
+- Fontsource: Bodoni Moda variable for NEREID (import `opsz.css`, not the default file), Instrument Sans variable for headings (`wdth.css`, `wdth-italic.css`), IBM Plex Sans, IBM Plex Mono. All OFL.
+- Use pnpm (`npx --yes pnpm@10.28.0` if pnpm isn't installed). Build with `tsc -b` + `vite build --base=/mission-002/`. Public assets use relative paths.
+- Skill: `.claude/skills/vgpu/` (official, pinned in `skills-lock.json`); `./node_modules/.bin/vgpu docs find <topic>`.
 
 ```bash
 pnpm install
-pnpm dev        # http://localhost:5173
-pnpm test       # vitest: camera, story, director, quality tiers
+pnpm dev        # http://localhost:5173, opens a Chrome tab
+pnpm test       # vitest: camera, story, director, quality, callouts, mix
 pnpm build
 ```
 
 ## Structure
 
 ```
-index.html              seven <section> chapters (scroll spacers) with fixed frames, chapter gauge nav, anchors, fineprint
-storyboard.md           the seven-chapter storyboard, motion grammar and feasibility plan (read before changing the story)
-src/main.ts             scroll → story → director → renderer and the DOM overlay (kinetic type, anchors, gauge, diagram)
-src/lib/story.ts        the expedition clock: spring-smoothed story position P (0..7) and the sonar logic (tested)
-src/lib/director.ts     P + time → cameras, world weights, sun, flashes, depth (pure, tested)
-src/lib/camera.ts       ocean camera matrices and projection (tested against the original example's camera)
-src/lib/quality.ts      quality tiers, the frame-budget watcher and the governor that detects frame-rate caps (tested)
-src/type/kinetic.ts     per-chapter kinetic type: slices, focus, lamp, condense, sonar, rise, transmit
-src/sound.ts            the procedural sound engine (sound-design.md); src/audition.ts is the dev-only audition panel
-sound-design.md         the user's sound direction
+index.html              seven <section> chapters (scroll spacers) with fixed frames and callouts, gauge nav, fineprint
+src/main.ts             scroll → story → director → renderer, and the DOM overlay (kinetic type, callouts, gauge, diagram, sound cues)
+src/lib/story.ts        spring-smoothed story position P and the scroll-driven sonar (tested)
+src/lib/director.ts     P + time → cameras, world weights, flashes, depth (pure, tested)
+src/lib/camera.ts       ocean camera matrices (tested against the original example's camera)
+src/lib/quality.ts      tiers, frame-budget watcher, QualityGovernor (tested)
+src/type/kinetic.ts     scroll-driven kinetic type: slices (NEREID), fade (headings), transmit (status)
+src/type/callouts.ts    callout layout and build stages (tested)
+src/sound.ts            audio engine: beds, cues, buses, lazy loading (Web Audio)
+src/lib/mix.ts          takes and their loudness, bed crossfade, motion filter, onset detection (pure, tested)
+public/sound/           the picked takes, one file per role
+audition/               dev-only page and all 44 candidate takes (raw/ = beds before the seam crossfade)
 src/ocean/world.wgsl    space (stars, Jupiter, Europa, lineae, the dive, the signal) and the ice shaft
-src/ocean/plume.wgsl    the vent field: chimney points and a stateless rising plume
+src/ocean/plume.wgsl    the vent field
 src/ocean/*.wgsl        the vgpu fft-ocean pass graph (simulation and bloom unchanged; particles and present modified)
-src/ocean/renderer.ts   one graph: world (own lower-res target) → blit + ocean particles + plume → bloom → present
-public/stills/          seven stills rendered from the live scenes, loaded only when WebGPU is unavailable
+src/ocean/renderer.ts   one graph: world (own lower-res target) → blit + particles + plume → bloom → present
+public/stills/          seven stills from the live scenes, loaded only without WebGPU
 ```
 
-## Decisions
+## Decisions (still in force)
 
-- **vgpu fft-ocean as the base (required by the brief).** The pulled example (`vgpu examples pull fft-ocean`) matched the repo source byte for byte. It was first run unmodified in Chrome to confirm it renders (`references/00-vgpu-particles-ocean-baseline.png`), then that copy was deleted.
-- **Vanilla TS instead of React.** One hero with one canvas, so a framework adds weight and no value. Rejected: React (the example's wrapper) and Three.js (vgpu already is the renderer).
-- **The original camera replaced by a free yaw/pitch camera.** A unit test proves it reproduces the original view matrix at the surface pose.
-- **Descent driven by two cascaded exponential smoothers** rather than a tween. Velocity stays continuous, and a reset mid-move just reverses. Rejected: eased tweens, which jump in velocity when interrupted.
-- **Sonar physics as the source of all scan visuals.** 1 world unit = 50 m, so the ring travels at a true 1,500 m/s. The range readout, contours and annotation reveal all derive from the ring radius.
-- **Adaptive quality scales the scene and bloom targets, not the canvas.** The surface DPR is fixed at creation in vgpu 0.6, so tiers cap the scene's DPR, scale its render size and, on the lowest tier, draw every second particle per axis (per-call `instances`). Tiers only ever step down, which avoids oscillation.
-- **Fallback is a still of our own render**, not stock imagery, and the interface still runs.
-- **Performance (after user feedback: lag on an M1 MacBook Air at 2×):** profiling showed the FFT simulation and the half-resolution bloom each cost about half a frame. Medium and low run the simulation every second frame and start bloom at quarter resolution. Retina screens start on medium. The frame watcher reacts within about 1.5 s and counts slow frames instead of ignoring them. The choreography clamps dt at 0.1 s per frame (the spring integrates in 1/120 s substeps).
-- **Immediate response:** the pulse fires on the click, not on arrival (it used to wait about 3 s, and far longer at low frame rates).
-- **Scroll = descend:** there is one scene, so wheel, swipe and arrow keys move through it (down descends, up returns), one move per gesture.
-- **Fonts (v1):** Cormorant Garamond for the headline, Archivo for the wordmark, IBM Plex Mono for instrument text. All OFL via Fontsource. Superseded by the 2026-11-24 type system below; not yet rebuilt.
-- **Adopted the user's art direction, references and design spec (2026-11-24)** as the source of truth. My first art direction (an open-sea point cloud) is folded in as the rendering language: a spectral reconstruction.
-- **v2 (rift, foreground drift, design.md copy, Plex type, early headline) was built and then rejected by the user, and reverted in full.** Reasons given: the drift and the glowing line read as meaningless, the colours felt worse, and the extra motion felt unnecessary. Lesson: on this mission, the sonar wave is the whole idea. New visual layers dilute it.
-- **The return mirrors the descent:** on ascent, the ring starts wide (150 units) and gathers into the probe over 1.8 s, then releases one small ripple (40 units). The descent is faster (two-stage smoothing, τ = 0.5 s, about 3 s), and the copy fades were shortened.
-- **No animation library.** The motion lives in shaders and one state machine; GSAP or Motion would only feed the same numbers. Theatre.js is the one candidate, if the camera path ever needs hand-keyed tuning.
-- **Type system (2026-11-24): Bodoni Moda, IBM Plex Sans, IBM Plex Mono**, from the user's typography direction (art-direction 04b). Bodoni Moda (variable: `opsz` 6–96, `wght` 400–900, italics; import `opsz.css` and `opsz-italic.css`) sets the mission title and chapter headlines. Plex Sans carries narrative and controls; Plex Mono carries annotations and telemetry. Supersedes Cormorant Garamond and Archivo. Scale and `clamp()` values are in design.md 04. All OFL via Fontsource. Installed.
+- **vgpu fft-ocean as the base** (required by the brief); vanilla TS instead of React; a free yaw/pitch camera, unit-tested against the original view.
+- **One renderer, three worlds** (space, ice shaft, ocean) blended by a pure director. The dive and the breakthrough hide their seams behind light. The rewind is a plain dissolve: any flash there reads as grey fog.
+- **No animation or scroll libraries** (GSAP, Theatre.js and Lenis were rejected): the director owns every number, and native scroll keeps keyboard and assistive-tech behaviour.
+- **Pacing is measured, not guessed**, with a motion profile (on-screen change per 100 px of scroll). Speed changes gradually; the dive is the slowest moment, by request.
+- **Space world at reduced resolution by tier.** At full resolution the Europa close-ups ran at 47 fps on an M1 at 2×. The limb is anti-aliased analytically.
+- **Lineae are anisotropic ridged noise;** isotropic noise read as a brain texture.
+- **Fallback = stills of our own scenes,** not stock imagery.
 
-- **v3, the seven-chapter expedition (2026-11-24, user direction):** one renderer, three worlds (space, ice shaft, the existing ocean) blended by a pure director from a spring-smoothed story position. Every world change hides behind a physical event (dive, breakthrough, rewind). Studied the Event Horizon benchmark first; kept its principles (one subject, escalating reveals, a progress gauge, ending on a question), not its look. See storyboard.md.
-- **No new libraries for v3.** GSAP, Theatre.js and Lenis were each rejected: the director already owns every number, and native scroll keeps keyboard and assistive-tech behaviour.
-- **Space world at reduced resolution, by tier** (0.75/0.6/0.5 of the scene). The Europa close-ups cost about 18 noise evaluations per pixel; at full scene resolution they ran at 47 fps on the M1 at 2×, and at 60 fps rendered smaller and upscaled. The limb is anti-aliased analytically so the upscale doesn't stair-step.
-- **Lineae are anisotropic ridged noise** (stretched domains in three orientations). Isotropic ridged noise read as a brain texture.
-- **The sonar sweep is scroll-driven (user, 2026-11-24):** the ring radius is a function of story position (P 3.92 → 4.8), not of time, so it plays as the visitor scrolls closer, holds when they stop, and reverses on the way up. The headline is revealed by a mask that follows the ring's projected radius.
-- **Fallback = seven stills of our own scenes,** loaded only when WebGPU is missing.
-- **Pacing is measured, not guessed (v4):** a motion profile (screen change per 100 px of scroll across P 0–7) found a dead Opening, an Arrival compressed into a third of its chapter, and a dive 30–40× faster than the baseline. The beats now live in `BEATS` in director.ts.
-- **No flash on the rewind:** any flash adds linear ice colour, which reads as grey fog over the dark space world.
+## Rules (from the user's feedback)
 
-## Mission-specific rules
-
-- Cyan (`#8be3f5`) only marks the active instrument (pulse, contours, focus). Warm (`#f1d3a1`) only marks the thermal anomaly. The two CTA buttons (#begin, #replay) are engraved Golden Record gold (label `#e3b866`, highlight `#f7dc98`, edge `#7a5420`, plate `#140e07`), the user's direction from the Voyager record reference (2026-11-24).
-- Every visual effect must come from the simulation or the pulse. No decorative particles.
-- Never use NASA logos or branding. Keep the unofficial notice visible at every size.
-- Type: no Orbitron, gaming or "futuristic" display fonts. No neon glow, text-shadow bloom or gradient-filled headlines. Uppercase only for the title and short instrument labels.
-- No repeated fade-up scroll reveals, and no two chapters with the same heading layout. Each chapter's type moves with what its environment is doing: the camera, the light, the sonar, the discovery.
+- **The sonar wave is the heart of the piece.** Don't add visual layers (drift, decorative lines, colour shifts) without asking: v2 did, and the user rejected it in full.
+- **Colour:** cyan (`#8be3f5`) marks the active instrument (pulse, contours, focus). Warm (`#f1d3a1`) marks the thermal anomaly. The CTA buttons are engraved Golden Record gold: label `#e3b866`, highlight `#f7dc98`, edge `#7a5420`, plate `#140e07`.
+- **Type:**
+  - Bodoni Moda is for the name NEREID only: the user found it unreadable for headings over the moving scene. Headings are Instrument Sans (weight 500, tracking −0.032em, italic for emphasis), chosen in a spike against Schibsted Grotesk, Fraunces and Hanken Grotesk. Everything else is IBM Plex Sans; instrument labels are Plex Mono.
+  - No Orbitron or "futuristic" faces, no neon glow, no gradient headlines. Uppercase only for the title and short labels.
+  - Headlines never re-wrap mid-animation, letters never move in, and no glyph is ever clipped (the user saw the "g" cut).
+- **Text:** keep it minimal. Only what the moment needs, at most one callout per chapter, never text that leaves before it can be read, and never text that jumps position.
+- **One thing at a time** (the user: "while reading one we cannot read the other"): within a chapter, the heading forms (by 0.18 of the chapter), then the callout line by line, then the status or question, then the action, each after the one before has been read; nothing forms while something else is forming, and headings leave late (0.82 → 0.99). Check any timing change with the formation audit (every text element's 10–90 % window against the story position; no overlaps).
+- **Motion:** everything the visitor reads follows the scroll, never its own timer (a timed build was missed by visitors who had already scrolled on). No blur, scatter, rise, wipe or other slide-deck entrances on words (the user: "looks like a presentation slide animation"); no fade-up reveals. Nothing feels sped up; changes of speed are gradual.
+- **Effects:** every visual effect comes from the simulation or the pulse. No decorative particles.
+- **Branding:** never use NASA logos or branding. Keep the unofficial notice visible at every size. The expedition and its discoveries are fictional, and the site says so.
+- **Audio:** none before a user gesture; the noise-based ambience was rejected as "disturbance". No sound on text: a tick on each callout landing made every chapter change feel like it stopped ("tick tick"), so callouts, headings and status lines are silent. Sound marks story events only, and must keep the scroll feeling continuous.

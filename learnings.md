@@ -24,6 +24,8 @@ Reusable discoveries from each mission: libraries worth knowing, prompting techn
 
 - **A ritual beats a result** (Mission 001): a random output feels far more special when it's earned through a short physical sequence (coin → wheel → printer → ticket, about two seconds). Use it for key moments, not routine ones.
 - **Character comes from reactions, not constant motion** (Mission 001): a sprite that barely moves still feels alive when it reacts to what happens (notices the coin, works a lever, reacts to the result). 13 frames on one base sprite were enough. See `src/lib/art/tikku.ts`.
+- **Pace reading text in units of scroll** (Mission 002): time callouts in vh of scroll (here 1.4vh per word as the words come up, then a 10vh pause), not in chapter percentages, so text stays readable when a chapter's length changes. Words fade up one by one; nothing new forms while something else is forming. See `schedule` and `wordAt` in `mission-002-nereid/src/type/callouts.ts`.
+- **Audit text timing automatically** (Mission 002): sample every text element's visible opacity while scrolling slowly, record when each forms (10 % → 90 %) against the story position, and flag overlaps. One run finds every collision a person would notice.
 - **Reduced motion as an instant version** (Mission 001): with `prefers-reduced-motion`, show the end state immediately (the ticket just appears) rather than removing the result.
 
 ## Rendering and visual tricks
@@ -35,6 +37,9 @@ Reusable discoveries from each mission: libraries worth knowing, prompting techn
 
 - **Synthesised Web Audio effects through one master bus** (Mission 001): six original effects made with oscillators and noise, no audio files. One master gain node keeps the volume consistent and makes muting trivial. See `src/lib/sound.ts`.
 - **Sound on by default, unlocked on first gesture** (Mission 001): browsers block audio until a click or tap, so create or resume the `AudioContext` on the first interaction. Always provide a visible mute toggle.
+
+- **Generated sound needs measuring, and auditioning by the user** (Mission 002): ElevenLabs Sound Effects v3 gives four takes per prompt; takes vary a lot in silent lead-in (up to 0.8 s), spikes and loop seams. Measure each take (ffmpeg `ebur128` for loudness, onset, crest), skip the lead-in so cues land on the beat, crossfade loop tails into heads, and level each take from its measured LUFS. A dev-only audition page whose picks override the site's defaults (same origin, `localStorage`) lets the user hear takes in place. See `mission-002-nereid/src/lib/mix.ts`.
+- **Mix for laptop speakers, and measure the output** (Mission 002): ambience mixed dark and quiet was inaudible on laptop speakers. Keep some top end (here a 1.8 kHz low-pass at rest), and measure the real output level by tapping the destination with an `AnalyserNode` in a headless browser. Scrolling doesn't count as a gesture for audio, so plan any opening sound around the first click.
 
 ## Implementation tricks
 

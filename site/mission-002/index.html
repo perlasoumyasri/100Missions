@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>NEREID: What is hiding beneath Europa's ice?</title>
+    <meta
+      name="description"
+      content="An unofficial, fictional expedition: a probe melts through Europa's ice to the hidden ocean beneath, and follows a warm signal. A WebGPU experience made for 100 Missions."
+    />
+    <meta name="theme-color" content="#03090e" />
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+    <script type="module" crossorigin src="/mission-002/assets/index-CnLYCr64.js"></script>
+    <link rel="stylesheet" crossorigin href="/mission-002/assets/index-BbblFNDb.css">
+  </head>
+  <body data-gpu="pending" data-chapter="0">
+    <a class="skip" href="#ch-7">Skip to the transmission</a>
+
+    <div class="stage" aria-hidden="true">
+      <img class="poster" alt="" width="1600" height="1000" decoding="async" />
+      <canvas class="world" id="world"></canvas>
+    </div>
+
+    <header class="masthead">
+      <p class="wordmark">NEREID</p>
+      <p class="masthead__flag">Unofficial concept</p>
+      <button class="sound" id="sound" type="button" aria-pressed="true">Sound <span data-sound-state>on</span></button>
+    </header>
+
+    <nav class="gauge" aria-label="Expedition chapters">
+      <ol class="gauge__list">
+        <li><a href="#ch-1"><span class="gauge__n">01</span><span class="gauge__label">The Mystery</span></a></li>
+        <li><a href="#ch-2"><span class="gauge__n">02</span><span class="gauge__label">Arrival</span></a></li>
+        <li><a href="#ch-3"><span class="gauge__n">03</span><span class="gauge__label">The Descent</span></a></li>
+        <li><a href="#ch-4"><span class="gauge__n">04</span><span class="gauge__label">First Contact</span></a></li>
+        <li><a href="#ch-5"><span class="gauge__n">05</span><span class="gauge__label">The Anomaly</span></a></li>
+        <li><a href="#ch-6"><span class="gauge__n">06</span><span class="gauge__label">The Discovery</span></a></li>
+        <li><a href="#ch-7"><span class="gauge__n">07</span><span class="gauge__label">The Transmission</span></a></li>
+      </ol>
+      <span class="gauge__marker" id="gauge-marker" aria-hidden="true"></span>
+      <p class="gauge__depth" aria-hidden="true"><span id="depth">0</span> m <span class="gauge__sim">sim.</span></p>
+    </nav>
+
+    <main>
+      <!-- Each chapter answers one question and raises the next. Status lines and actions carry a
+           data-window (chapter progress where they appear and leave), so they land on the visual event. -->
+      <section class="chapter" id="ch-1" aria-labelledby="t-1" style="--len: 150">
+        <div class="frame frame--1" data-frame="0">
+          <p class="journey">Nearly 800 million kilometres <em>from the Sun.</em></p>
+          <p class="kicker">The expedition · Europa, moon of Jupiter</p>
+          <h1 class="title" id="t-1" data-kinetic="slices">NEREID</h1>
+          <p class="tagline" data-kinetic="fade">What is hiding beneath Europa's ice?</p>
+          <div class="callout callout--gold" data-at="europa" data-span="intro,0.6" data-slot="0.655,0.4,-1,1,0.3">
+            <span class="callout__mark" aria-hidden="true"></span><span class="callout__leg" aria-hidden="true"></span>
+            <p class="callout__text"><span class="callout__line">From space, Europa looks frozen in time.</span><span class="callout__line">But its surface has puzzled scientists for decades.</span></p>
+          </div>
+          <div class="begin">
+            <button class="cta" id="begin" type="button" data-go="1.5">Begin expedition <span class="cta__glyph" aria-hidden="true"></span></button>
+            <p class="hint" aria-hidden="true">or scroll</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="chapter" id="ch-2" aria-labelledby="t-2" style="--len: 170">
+        <div class="frame frame--2" data-frame="1">
+          <p class="index"><span>02</span> Arrival</p>
+          <h2 class="headline" id="t-2" data-kinetic="fade">From here, it looks <em>lifeless.</em></h2>
+          <div class="callout callout--gold" data-at="ice" data-span="0.24,0.97" data-slot="0.56,0.62,1,0,0.78">
+            <span class="callout__mark" aria-hidden="true"></span><span class="callout__leg" aria-hidden="true"></span>
+            <p class="callout__text"><span class="callout__line">Jupiter's pull bends and breaks this ice.</span><span class="callout__line">Some of these cracks may carry material up from below.</span></p>
+          </div>
+          <p class="status" data-kinetic="transmit" data-window="0.57,0.65">Landing site identified. Preparing probe.</p>
+        </div>
+      </section>
+
+      <section class="chapter" id="ch-3" aria-labelledby="t-3" style="--len: 190">
+        <div class="frame frame--3" data-frame="2">
+          <p class="index"><span>03</span> The Descent</p>
+          <h2 class="headline" id="t-3" data-kinetic="fade">How far down does <em>the ice go?</em></h2>
+          <div class="callout callout--ice" data-at="lamp" data-span="0.42,0.97" data-slot="0.56,0.42,1,1,0.66">
+            <span class="callout__mark" aria-hidden="true"></span><span class="callout__leg" aria-hidden="true"></span>
+            <p class="callout__text"><span class="callout__line">Our probe melts its way down.</span><span class="callout__line">Above us, the sunlight is already gone.</span></p>
+          </div>
+          <p class="readout" aria-hidden="true"><span id="shaft-depth">0</span><span class="readout__unit">m below the surface · simulated</span></p>
+          <p class="status" data-kinetic="transmit" data-window="0.69,0.76,0.97,1.02">Ice thinning. Liquid water detected below.</p>
+        </div>
+      </section>
+
+      <section class="chapter" id="ch-4" aria-labelledby="t-4" style="--len: 190">
+        <div class="frame frame--4" data-frame="3">
+          <p class="index"><span>04</span> First Contact</p>
+          <h2 class="headline" id="t-4" data-kinetic="fade">There is an ocean <em>down here.</em></h2>
+          <div class="callout callout--ice" data-at="water" data-span="0.31,0.97" data-slot="0.4,0.25,-1,0,0.31">
+            <span class="callout__mark" aria-hidden="true"></span><span class="callout__leg" aria-hidden="true"></span>
+            <p class="callout__text"><span class="callout__line">It may hold twice the water of all Earth's oceans.</span><span class="callout__line">And we are only at the top of it.</span></p>
+          </div>
+          <p class="narrative narrative--ask" data-window="0.61,0.65">How do we explore something we cannot see?</p>
+          <div class="act" data-window="0.7,0.74">
+            <button class="cta" type="button" data-go="4.5">Activate sonar <span class="cta__glyph" aria-hidden="true"></span></button>
+          </div>
+        </div>
+      </section>
+
+      <section class="chapter" id="ch-5" aria-labelledby="t-5" style="--len: 220">
+        <div class="frame frame--5" data-frame="4">
+          <p class="index"><span>05</span> The Anomaly</p>
+          <h2 class="headline" id="t-5" data-kinetic="fade">We send sound <em>into the dark.</em></h2>
+          <div class="callout callout--warm" data-at="anomaly" data-span="0.38,0.97" data-slot="0.475,0.255,1,0,0.42" data-gate="anomaly">
+            <span class="callout__mark" aria-hidden="true"></span><span class="callout__leg" aria-hidden="true"></span>
+            <p class="callout__text"><span class="callout__line callout__data">Thermal anomaly · ΔT&nbsp;+3.1&nbsp;K · <span data-anomaly-range>4.4 km</span> · simulated</span><span class="callout__line">In water near freezing, one region is unusually warm.</span><span class="callout__line">Something down there is giving off heat.</span></p>
+          </div>
+          <p class="annot" aria-hidden="true">Sonar range <span id="sonar-range">0.00</span> km · simulated</p>
+          <div class="act" data-window="0.7,0.74">
+            <button class="cta" type="button" data-go="5.55">Follow the heat signal <span class="cta__glyph" aria-hidden="true"></span></button>
+          </div>
+        </div>
+      </section>
+
+      <section class="chapter" id="ch-6" aria-labelledby="t-6" style="--len: 180">
+        <div class="frame frame--6" data-frame="5">
+          <p class="index"><span>06</span> The Discovery</p>
+          <h2 class="headline" id="t-6" data-kinetic="fade">We've seen this before. <em>On Earth.</em></h2>
+          <div class="callout callout--warm" data-at="vent" data-span="0.42,0.97" data-slot="0.58,0.36,1,1,0.56">
+            <span class="callout__mark" aria-hidden="true"></span><span class="callout__leg" aria-hidden="true"></span>
+            <p class="callout__text"><span class="callout__line callout__data">Hydrothermal vent · T&nbsp;+11&nbsp;°C · chemical gradient · simulated</span><span class="callout__line">Around vents like these on Earth, whole ecosystems live in darkness, fed by chemistry, not sunlight.</span></p>
+          </div>
+          <p class="status" data-kinetic="transmit" data-window="0.74,0.82,0.99,1.03">Collecting water samples. Analysing chemical composition.</p>
+        </div>
+      </section>
+
+      <section class="chapter" id="ch-7" aria-labelledby="t-7" style="--len: 220">
+        <div class="frame frame--7" data-frame="6">
+          <p class="index"><span>07</span> The Transmission</p>
+          <h2 class="question" id="t-7" data-kinetic="fade">Water. Heat. Chemistry. <em>Life?</em></h2>
+          <div class="callout callout--gold" data-at="earth" data-span="0.62,0.97" data-slot="0.44,0.19,-1,0,0.27">
+            <span class="callout__mark" aria-hidden="true"></span><span class="callout__leg" aria-hidden="true"></span>
+            <p class="callout__text"><span class="callout__line">The first life we find beyond Earth may be too small to see without a microscope.</span></p>
+          </div>
+          <div class="act" data-window="0.26,0.29,0.4,0.45">
+            <button class="cta" type="button" data-go="6.8">Transmit findings <span class="cta__glyph" aria-hidden="true"></span></button>
+          </div>
+          <p class="transmit" data-kinetic="transmit" data-window="0.47,0.57">Transmitting to Earth · signal delay 43 min · simulated</p>
+          <p class="narrative narrative--close" data-window="0.81,0.84">The next mission will know exactly where to look.</p>
+          <svg class="diagram" viewBox="0 0 400 400" aria-hidden="true">
+            <g class="diagram__rays"></g>
+            <circle class="diagram__ring" cx="200" cy="200" r="58" />
+            <circle class="diagram__ring diagram__ring--outer" cx="200" cy="200" r="132" />
+            <line class="diagram__axis" x1="40" y1="200" x2="360" y2="200" />
+          </svg>
+          <div class="end act" data-window="0.885,0.92">
+            <button class="cta cta--replay" id="replay" type="button">Replay the expedition <span class="cta__glyph" aria-hidden="true"></span></button>
+          </div>
+        </div>
+      </section>
+      <div class="runout" aria-hidden="true"></div>
+    </main>
+
+
+    <footer class="fineprint">
+      <p>Unofficial concept. NEREID, its expedition and its discoveries are fictional, and not affiliated with NASA. Visuals and data are simulated.</p>
+      <p class="fineprint__credit">Mission 002 of 100 · built on vgpu</p>
+    </footer>
+
+    <p class="fallback-note" role="note">WebGPU isn't available in this browser, so you're seeing still frames. Try a recent Chrome, Edge or Safari for the live expedition.</p>
+    <p class="sr-only" id="live" aria-live="polite"></p>
+    <noscript><p class="fallback-note fallback-note--static">This experience needs JavaScript and WebGPU.</p></noscript>
+  </body>
+</html>

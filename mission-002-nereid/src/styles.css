@@ -1,5 +1,6 @@
 @import "@fontsource-variable/bodoni-moda/opsz.css";
-@import "@fontsource-variable/bodoni-moda/opsz-italic.css";
+@import "@fontsource-variable/instrument-sans/wdth.css";
+@import "@fontsource-variable/instrument-sans/wdth-italic.css";
 @import "@fontsource/ibm-plex-sans/400.css";
 @import "@fontsource/ibm-plex-sans/400-italic.css";
 @import "@fontsource/ibm-plex-mono/400.css";
@@ -13,7 +14,9 @@
   --ice: #8be3f5;
   --thermal: #f1d3a1;
 
+  /* Bodoni is for the name NEREID only; headings are Instrument Sans (readable over the moving scene). */
   --display: "Bodoni Moda Variable", "Bodoni 72", "Didot", Georgia, serif;
+  --head: "Instrument Sans Variable", "Helvetica Neue", Arial, sans-serif;
   --sans: "IBM Plex Sans", "Helvetica Neue", Arial, sans-serif;
   --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
 
@@ -312,12 +315,17 @@ em {
   margin-right: 10px;
 }
 
-.title,
-.headline,
-.question {
+.title {
   font-family: var(--display);
   font-weight: 400;
   font-optical-sizing: auto;
+  color: var(--text);
+}
+
+.headline,
+.question {
+  font-family: var(--head);
+  font-weight: 500;
   color: var(--text);
 }
 
@@ -330,9 +338,8 @@ em {
 
 .headline {
   font-size: var(--fs-headline);
-  font-weight: 600; /* more presence over the moving particles; the hairlines stay fine */
-  line-height: 0.96;
-  letter-spacing: -0.01em;
+  line-height: 1;
+  letter-spacing: -0.032em;
   text-wrap: balance;
 }
 
@@ -341,9 +348,11 @@ em {
   font-style: italic;
 }
 
+
 .narrative {
   text-shadow: 0 0 14px rgb(3 9 14 / 0.9), 0 0 3px rgb(3 9 14 / 0.7);
   max-width: 34ch;
+  text-wrap: balance;
   line-height: 1.55;
   color: var(--text-2);
 }
@@ -381,8 +390,9 @@ em {
   top: 50%;
   transform: translateY(-50%);
   max-width: 12ch;
-  font-family: var(--display);
+  font-family: var(--head);
   font-size: clamp(2.25rem, 1.4rem + 3.4vw, 5.5rem);
+  letter-spacing: -0.03em;
   line-height: 1;
   color: var(--text);
   text-shadow: 0 0 18px rgb(3 9 14 / 0.85);
@@ -415,6 +425,11 @@ em {
 
 .frame--1 .narrative {
   margin-left: 0.2em;
+}
+
+/* The first action arrives after the Europa callout (--act, from the intro clock). */
+.frame--1 .begin {
+  opacity: calc(var(--act, 1) * (1 - var(--out, 0)));
 }
 
 .begin {
@@ -586,10 +601,6 @@ em {
   max-width: 10ch;
 }
 
-.frame--3 .narrative {
-  max-width: 30ch;
-}
-
 .readout {
   display: grid;
   gap: 6px;
@@ -646,15 +657,22 @@ em {
 
 .question {
   font-size: clamp(2.5rem, 0.9rem + 4.6vw, 6.5rem);
-  font-weight: 600;
   max-width: 13ch;
-  line-height: 0.9;
-  letter-spacing: -0.01em;
+  line-height: 1;
+  letter-spacing: -0.032em;
 }
 
 .transmit,
 .status {
+  --cursor: rgb(139 227 245 / 0.85);
   color: var(--ice);
+}
+
+/* Teleprinter: a letter lands white-hot (--f = 1) and cools to the line's cyan over the next two. */
+.transmit .ch,
+.status .ch {
+  color: color-mix(in oklab, #fff calc(var(--f, 0) * 100%), var(--ice));
+  text-shadow: 0 0 calc(var(--f, 0) * 10px) rgb(139 227 245 / 0.9);
 }
 
 .diagram {
@@ -687,85 +705,6 @@ em {
 
 .end {
   margin-top: 10px;
-}
-
-/* ───── Anchored annotations ───── */
-
-.anchor {
-  position: fixed;
-  left: 0;
-  top: 0;
-  z-index: 2;
-  pointer-events: none;
-  font-family: var(--mono);
-  font-size: var(--fs-annot);
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--text);
-  opacity: 0;
-  transition: opacity 0.5s var(--ease-out);
-  will-change: transform;
-}
-
-.anchor.is-visible {
-  opacity: 1;
-}
-
-.anchor__mark {
-  position: absolute;
-  left: -7px;
-  top: -7px;
-  width: 14px;
-  height: 14px;
-  border: 1px solid currentColor;
-  border-radius: 50%;
-}
-
-.anchor__leader {
-  position: absolute;
-  left: 6px;
-  bottom: 6px;
-  width: 1px;
-  height: 56px;
-  background: currentColor;
-  transform-origin: bottom;
-  transform: rotate(38deg);
-  opacity: 0.8;
-}
-
-.anchor__label {
-  position: absolute;
-  left: 40px;
-  bottom: 52px;
-  white-space: nowrap;
-  line-height: 1.8;
-}
-
-.anchor--warm {
-  color: var(--thermal);
-}
-
-.anchor--warm .anchor__label {
-  color: var(--text);
-}
-
-.anchor__data {
-  color: var(--thermal);
-}
-
-.anchor--crack {
-  color: var(--ice);
-}
-
-.anchor--flip .anchor__leader {
-  left: -7px;
-  transform: rotate(-38deg);
-}
-
-.anchor--flip .anchor__label {
-  left: auto;
-  right: 40px;
-  text-align: right;
 }
 
 /* ───── States ───── */
@@ -847,20 +786,6 @@ em {
     padding-right: var(--gutter);
   }
 
-  /* On phones, labels sit just under their marker, clear of the text above. */
-  .anchor__leader {
-    display: none;
-  }
-
-  .anchor__label,
-  .anchor--flip .anchor__label {
-    bottom: auto;
-    top: 14px;
-    left: auto;
-    right: -7px;
-    text-align: right;
-  }
-
   .fineprint {
     flex-direction: column;
     gap: 4px;
@@ -868,11 +793,6 @@ em {
 
   .fineprint__credit {
     display: none;
-  }
-
-  .anchor__label {
-    left: 30px;
-    bottom: 44px;
   }
 }
 
@@ -936,10 +856,6 @@ em {
   color: var(--text);
 }
 
-.frame .narrative + .narrative {
-  margin-top: -6px;
-}
-
 /* Status lines report from the probe's instruments, typed out at the moment they happen. */
 .status {
   margin-top: 6px;
@@ -955,23 +871,198 @@ em {
 }
 
 @media (max-width: 700px) {
-  .frame .narrative + .narrative {
-    margin-top: -8px;
-  }
-
   .question {
     max-width: 11ch;
   }
 }
 
-/* "Not yet." is one thought: never split across lines. */
-.question em {
+
+/* ───── Callouts ───── */
+
+/* A few lines of the narrative pinned to the scene, engraved in the manner of the Golden Record's
+   diagrams: a small ring on the target, a hairline leader, and a shelf the words sit on. Positions and
+   the build (--mark, --leg, --shelf, and --w per line) come from JS each frame. */
+.callout {
+  --tone: rgb(227 184 102 / 0.85);
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 2;
+  pointer-events: none;
+  visibility: hidden;
+  /* Callouts build on their own clock; they share only the chapter's exit. */
+  opacity: calc(1 - var(--out, 0));
+}
+
+.frame.is-live .callout.is-on {
+  visibility: visible;
+}
+
+.callout--ice {
+  --tone: rgb(200 238 240 / 0.8);
+}
+
+.callout--warm {
+  --tone: var(--thermal);
+}
+
+.callout__mark,
+.callout__leg {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+.callout__mark {
+  left: -5px;
+  top: -5px;
+  width: 10px;
+  height: 10px;
+  border: 1px solid var(--tone);
+  border-radius: 50%;
+  opacity: var(--mark, 0);
+  transform: translate3d(var(--x, 0), var(--y, 0), 0) scale(calc(0.4 + 0.6 * var(--mark, 0)));
+}
+
+/* The centre tick. */
+.callout__mark::after {
+  content: "";
+  position: absolute;
+  left: 3px;
+  top: 3px;
+  width: 2px;
+  height: 2px;
+  border-radius: 50%;
+  background: var(--tone);
+}
+
+.callout__leg {
+  top: -0.5px;
+  width: 1px;
+  height: 1px;
+  background: var(--tone);
+  transform-origin: 0 50%;
+  transform: translate3d(var(--lx, 0), var(--ly, 0), 0) rotate(var(--la, 0rad)) scaleX(calc(var(--ll, 0) * var(--leg, 0)));
+}
+
+.callout__text {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: max-content;
+  max-width: 30ch;
+  padding-bottom: 12px;
+  transform: translate3d(var(--tx, 0), var(--ty, 0), 0);
+  will-change: transform;
+  font-size: clamp(1rem, 0.95rem + 0.2vw, 1.1875rem);
+  line-height: 1.45;
+  color: var(--text);
+  text-shadow:
+    0 0 16px rgb(3 9 14 / 0.95),
+    0 0 4px rgb(3 9 14 / 0.8);
+}
+
+.callout.is-shelf-top .callout__text {
+  padding: 12px 0 0;
+}
+
+.callout.is-from-right .callout__text {
+  text-align: right;
+}
+
+/* A soft dark plate behind the words keeps them readable (AA) over bright ice and the vent's glow. */
+.callout__text::before {
+  content: "";
+  position: absolute;
+  inset: 6px 0;
+  z-index: -1;
+  border-radius: 40px;
+  background: rgb(3 9 14 / 0.42);
+  box-shadow: 0 0 34px 24px rgb(3 9 14 / 0.42);
+  opacity: var(--text, 0);
+}
+
+/* The shelf grows from where the leader meets it. */
+.callout__text::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: var(--tone);
+  transform-origin: var(--origin, 0) 50%;
+  transform: scaleX(var(--shelf, 0));
+}
+
+.callout.is-shelf-top .callout__text::after {
+  top: 0;
+  bottom: auto;
+}
+
+/* The words come up in place once the leader has reached the shelf, one line at a time (--l, from the
+   reading pace in type/callouts.ts): no wipe, no movement. */
+.callout__line {
+  display: block;
+  text-wrap: balance;
+  opacity: var(--l, 0);
+}
+
+/* A sentence's words come up one by one, in place, as if being read aloud (--w from main.ts). */
+.callout__word {
+  opacity: var(--w, 0);
+}
+
+[data-callouts="static"] .callout__word {
+  opacity: 1;
+}
+
+.callout__line + .callout__line {
+  margin-top: 0.3em;
+}
+
+.nowrap {
   white-space: nowrap;
 }
 
-/* On phones the vent's label would sit on the Discovery text: the marker alone points to it. */
+.callout__data {
+  margin-bottom: 0.5em;
+  font-family: var(--mono);
+  font-size: var(--fs-annot);
+  letter-spacing: 0.12em;
+  line-height: 1.6;
+  text-transform: uppercase;
+  color: var(--thermal);
+}
+
 @media (max-width: 700px) {
-  #anchor-vent .anchor__label {
-    display: none;
+  .callout__text {
+    max-width: calc(100vw - 2 * var(--gutter));
+    font-size: 0.9375rem;
   }
+}
+
+/* No WebGPU, or reduced motion: no leaders. The chapter's callouts sit in its text column, whole. */
+[data-callouts="static"] .callout {
+  position: static;
+  visibility: inherit;
+}
+
+[data-callouts="static"] .callout__mark,
+[data-callouts="static"] .callout__leg,
+[data-callouts="static"] .callout__text::before,
+[data-callouts="static"] .callout__text::after {
+  display: none;
+}
+
+[data-callouts="static"] .callout__text {
+  position: static;
+  max-width: 34ch;
+  padding: 0;
+  transform: none;
+  text-align: inherit;
+}
+
+[data-callouts="static"] .callout__line {
+  opacity: 1;
 }

@@ -1,12 +1,13 @@
 import "./styles.css";
 
-import { CRACK_NORMAL, DIVE_POINT, EARTH_DIR, oceanMatrices, projectSpace, PULSE_POINT, shoot, smooth, VENT, widenForAspect } from "./lib/director";
+import { clamp01, CRACK_NORMAL, EARTH_DIR, oceanMatrices, projectSpace, PULSE_POINT, shoot, smooth, VENT, widenForAspect } from "./lib/director";
 import { initialTier, QualityGovernor, type Tier } from "./lib/quality";
 import { ANOMALY, ANOMALY_DISTANCE, CHAPTERS, METRES_PER_UNIT, Story, type StoryEvent } from "./lib/story";
 import { hexLinear } from "./ocean/tuning";
 import type { FrameInfo, FrameParams, OceanRenderer } from "./ocean/renderer";
 import { createSound, type CueId } from "./sound";
-import { apply, measure as measureSplit, split, type Mode, type Split } from "./type/kinetic";
+import { buildAt, buildStages, CLOCK_PACE, layoutCallout, readTime, schedule, SCROLL_PACE, wordAt, type Line, type Slot } from "./type/callouts";
+import { apply, split, typed, type Mode, type Split } from "./type/kinetic";
 
 const $ = <T extends Element = HTMLElement>(s: string) => document.querySelector<T>(s)!;
 const reducedQuery = matchMedia("(prefers-reduced-motion: reduce)");
@@ -24,14 +25,81 @@ const parseWindow = (el: HTMLElement): Window | null =>
   el.dataset.window ? (el.dataset.window.split(",").map(Number) as unknown as Window) : null;
 const inWindow = ([a, b, c, d]: Window, lp: number) => smooth(a, b, lp) * (c === undefined ? 1 : 1 - smooth(c, d!, lp));
 
+/**
+ * A callout pins a few lines of the narrative to a target in the scene. It follows the scroll: over the
+ * start of its span (chapter progress) the ring, leader and words build, and at its end they fold away.
+ */
+interface Callout {
+  el: HTMLElement;
+  at: string;
+  /** Chapter progress where it turns on (null: the Opening's intro clock decides) and off. */
+  span: readonly [number | null, number];
+  /** Where the words sit; they never move, only the leader follows the target. */
+  slot: Slot;
+  gate?: string;
+  text: HTMLElement;
+  /** Its lines, which arrive one at a time; a sentence's words come up one by one (a reading comes up whole). */
+  lines: { el: HTMLElement; line: Line; words: HTMLElement[] }[];
+  sched: ReturnType<typeof schedule>;
+  /** Build progress 0..1 of the ring, leader and shelf, and the measured size of the words. */
+  k: number;
+  /** Once placed, a callout holds its last position if its target leaves the screen, rather than vanishing. */
+  placed: boolean;
+  w: number;
+  h: number;
+}
 interface Frame {
   el: HTMLElement;
+  /** The chapter's scroll length in vh (its section's --len), so reading pace can be set in vh of scroll. */
+  len: number;
   kinetic: { s: Split; mode: Mode; win: Window | null }[];
   /** Plain elements (actions, asides) that show only inside their window. */
   timed: { el: HTMLElement; win: Window }[];
+  callouts: Callout[];
 }
+const words = (el: Element) => (el.textContent ?? "").trim().split(/\s+/).length;
+/** Wraps each word of a plain sentence in a span, so the words can come up one by one. */
+const splitWords = (el: HTMLElement) => {
+  const parts = (el.textContent ?? "").trim().split(/\s+/);
+  el.textContent = "";
+  return parts.map((w, i) => {
+    const span = document.createElement("span");
+    span.className = "callout__word";
+    span.textContent = w;
+    if (i > 0) el.append(" ");
+    el.append(span);
+    return span;
+  });
+};
 const frames: Frame[] = [...document.querySelectorAll<HTMLElement>(".frame")].map((el) => ({
   el,
+  len: Number(el.closest<HTMLElement>(".chapter")!.style.getPropertyValue("--len")),
+  callouts: [...el.querySelectorAll<HTMLElement>(".callout")].map((c) => {
+    const [a, b] = c.dataset.span!.split(",");
+    const lines = [...c.querySelectorAll<HTMLElement>(".callout__line")].map((l) => {
+      const data = l.classList.contains("callout__data");
+      return { el: l, line: { words: words(l), data }, words: data ? [] : splitWords(l) };
+    });
+    return {
+      lines,
+      sched: schedule(
+        lines.map((l) => l.line),
+        a === "intro" ? CLOCK_PACE : SCROLL_PACE,
+      ),
+      el: c,
+      at: c.dataset.at!,
+      span: [a === "intro" ? null : Number(a), Number(b)] as const,
+      slot: ((v: number[]) => ({ x: v[0]!, y: v[1]!, side: v[2]! < 0 ? -1 : 1, up: v[3] === 1, phoneTop: v[4]! }) as Slot)(
+        c.dataset.slot!.split(",").map(Number),
+      ),
+      gate: c.dataset.gate,
+      text: c.querySelector<HTMLElement>(".callout__text")!,
+      k: 0,
+      placed: false,
+      w: 0,
+      h: 0,
+    };
+  }),
   kinetic: [...el.querySelectorAll<HTMLElement>("[data-kinetic]")].map((k) => {
     const mode = k.dataset.kinetic as Mode;
     return { s: split(k, mode), mode, win: parseWindow(k) };
@@ -91,7 +159,12 @@ const measure = () => {
   tops = sections.map((el) => el.offsetTop);
   heights = sections.map((el) => el.offsetHeight || innerHeight);
   gaugeH = gaugeList.clientHeight;
-  for (const f of frames) for (const k of f.kinetic) measureSplit(k.s);
+  for (const f of frames) {
+    for (const c of f.callouts) {
+      c.w = c.text.offsetWidth;
+      c.h = c.text.offsetHeight;
+    }
+  }
   onScroll();
 };
 let resizeTimer = 0;
@@ -196,7 +269,7 @@ $("#replay").addEventListener("click", () => {
 // Sound is on by default (a remembered preference). Browsers allow no audio before a gesture, so it
 // starts at the visitor's first click, tap or key press; the Sound button turns it off and on.
 const soundButton = $("#sound");
-let wantSound = localStorage.getItem("nereid-sound") !== "off";
+let wantSound = localStorage.getItem("nereid-sound-on") !== "off";
 const showSound = () => {
   soundButton.setAttribute("aria-pressed", String(wantSound));
   $("[data-sound-state]").textContent = wantSound ? "on" : "off";
@@ -209,7 +282,7 @@ const startSound = (e: Event) => {
 for (const ev of ["pointerdown", "keydown", "touchend"] as const) addEventListener(ev, startSound, { passive: true });
 soundButton.addEventListener("click", () => {
   wantSound = !wantSound;
-  localStorage.setItem("nereid-sound", wantSound ? "on" : "off");
+  localStorage.setItem("nereid-sound-on", wantSound ? "on" : "off");
   showSound();
   if (wantSound) void sound.enable(true);
   else sound.disable();
@@ -272,8 +345,7 @@ const gaugeList = $(".gauge__list");
 const depthEl = $("#depth");
 const shaftDepthEl = $("#shaft-depth");
 const sonarRangeEl = $("#sonar-range");
-const anchors = { crack: $("#anchor-crack"), anomaly: $("#anchor-anomaly"), vent: $("#anchor-vent") };
-for (const el of document.querySelectorAll("[data-anomaly-range]")) el.textContent = `${anomalyKm} km`;
+for (const el of document.querySelectorAll("[data-anomaly-range]")) el.textContent = `${anomalyKm}\u00a0km`;
 
 const text = new Map<HTMLElement, string>();
 const write = (el: HTMLElement, value: string) => {
@@ -299,20 +371,92 @@ const setVar = (el: HTMLElement, name: string, value: string) => {
 let lastDraw = -1;
 
 type Pt = { x: number; y: number; visible: boolean };
-function place(el: HTMLElement, pt: Pt, show: boolean, flipAt = 0.55) {
-  const on = show && pt.visible;
-  el.classList.toggle("is-visible", on);
-  // Near the right edge, the label hangs to the left of its marker.
-  el.classList.toggle("anchor--flip", pt.x > innerWidth * flipAt);
-  if (on) el.style.transform = `translate3d(${pt.x.toFixed(1)}px, ${pt.y.toFixed(1)}px, 0)`;
+
+type Target = "europa" | "ice" | "lamp" | "water" | "anomaly" | "vent" | "earth";
+interface Anchors {
+  targets: Record<Target, Pt>;
 }
 
-interface Anchors {
-  crack: Pt;
-  anomaly: Pt;
-  vent: Pt;
-  ring: { x: number; y: number; r: number } | null;
+// ───── Callouts ─────
+
+/** Chapter progress a callout takes to fold away. Its build follows the reading pace (type/callouts.ts). */
+const CALLOUT_FOLD = 0.04;
+const calloutViewport = () => {
+  const w = innerWidth;
+  const h = innerHeight;
+  const phone = w < 700;
+  // The chapter gauge owns the right edge on wide screens; the masthead and fine print own top and bottom.
+  return { w: w - (w > 900 ? 130 : 0), h, gutter: Math.min(96, Math.max(20, w * 0.052)), top: phone ? 72 : 86, bottom: phone ? 100 : 76, phone };
+};
+
+/**
+ * Without WebGPU there is nothing to pin to, and with reduced motion each chapter is held still: there,
+ * a chapter's callouts sit together in its text column, without leaders, for as long as the chapter shows.
+ */
+function updateCallouts(f: Frame, lp: number, targets: Anchors["targets"], openingT: number): void {
+  const pinned = body.dataset.gpu !== "unsupported" && !story.reducedMotion;
+  const mode = pinned ? "pinned" : "static";
+  if (body.dataset.callouts !== mode) body.dataset.callouts = mode;
+  const vp = calloutViewport();
+  for (const c of f.callouts) {
+    const t = targets[c.at as Target];
+    const before = c.k;
+    let lines: number[];
+    if (pinned) {
+      const [start, end] = c.span;
+      const span = end - (start ?? 0);
+      const fold = clamp01((end - lp) / Math.min(CALLOUT_FOLD, span * 0.25));
+      // The Opening's callout runs on the opening clock (seconds); the others on the scroll (vh of it).
+      const b =
+        start === null
+          ? buildAt(openingT - OPENING.callout, c.sched, CLOCK_PACE)
+          : buildAt((lp - start) * f.len, c.sched, SCROLL_PACE);
+      const gate = c.gate !== "anomaly" || story.anomalyFound;
+      const on = gate && (t.visible || c.placed) ? fold : 0;
+      c.k = Math.min(b.structure, on);
+      lines = b.lines.map((l) => Math.min(l, on));
+    } else {
+      c.k = lp > -0.1 && lp < 1 ? 1 : 0;
+      lines = c.lines.map(() => c.k);
+    }
+    if (c.k === 0) c.placed = false;
+    if (before === 0 && c.k === 0) continue;
+    if (c.el.classList.contains("is-on") !== c.k > 0) c.el.classList.toggle("is-on", c.k > 0);
+    if (pinned && t.visible) {
+      c.placed = true;
+      const pl = layoutCallout(t, c, vp, c.slot);
+      const px = (v: number) => `${v.toFixed(1)}px`;
+      setVar(c.el, "--x", px(t.x));
+      setVar(c.el, "--y", px(t.y));
+      setVar(c.el, "--lx", px(pl.leg.x));
+      setVar(c.el, "--ly", px(pl.leg.y));
+      setVar(c.el, "--la", `${pl.leg.angle.toFixed(3)}rad`);
+      setVar(c.el, "--ll", pl.leg.length.toFixed(1));
+      setVar(c.el, "--tx", px(pl.text.x));
+      setVar(c.el, "--ty", px(pl.text.y));
+      setVar(c.el, "--origin", px(pl.origin));
+      const fromRight = pl.origin > c.w * 0.5;
+      if (c.el.classList.contains("is-from-right") !== fromRight) c.el.classList.toggle("is-from-right", fromRight);
+      if (c.el.classList.contains("is-shelf-top") !== pl.shelfOnTop) c.el.classList.toggle("is-shelf-top", pl.shelfOnTop);
+    }
+    const st = buildStages(c.k);
+    setVar(c.el, "--mark", st.mark.toFixed(3));
+    setVar(c.el, "--leg", st.leg.toFixed(3));
+    setVar(c.el, "--shelf", st.shelf.toFixed(3));
+    // The plate behind the words comes up with the first line; each line then arrives on its own, a
+    // sentence word by word, a reading whole.
+    setVar(c.el, "--text", Math.min(1, (lines[0] ?? 0) * 4).toFixed(3));
+    c.lines.forEach((l, i) => {
+      const t = lines[i]!;
+      if (!l.words.length) return setVar(l.el, "--l", (t * t * (3 - 2 * t)).toFixed(3));
+      setVar(l.el, "--l", t > 0 ? "1" : "0");
+      l.words.forEach((w, j) => setVar(w, "--w", wordAt(t, j, l.words.length).toFixed(3)));
+    });
+  }
 }
+
+/** Letters struck so far on each teleprinter line, so each new one ticks once. */
+const struck = new Map<Split, number>();
 
 function overlay(p: number, depthM: number, a: Anchors): void {
   const reduced = story.reducedMotion;
@@ -323,6 +467,7 @@ function overlay(p: number, depthM: number, a: Anchors): void {
     scrollTo({ top: 0, behavior: "auto" });
     pendingFocus = { el: $("#begin"), frame: 0 };
   }
+  let openingT = 99;
   frames.forEach((f, i) => {
     const lp = p - i;
     const last = i === CHAPTERS - 1;
@@ -332,20 +477,24 @@ function overlay(p: number, depthM: number, a: Anchors): void {
     if (!near) return;
     let k: number;
     let inEnv: number;
-    // Headings hand over with a long, overlapping crossfade: one leaves as the next forms.
-    let out = last ? replayOut : smooth(0.7, 0.99, lp);
+    // One thing at a time: a heading forms early, the callout's lines and actions follow it, and the
+    // heading leaves late, as the next one forms, so nothing goes before it has been read.
+    let out = last ? replayOut : smooth(0.82, 0.99, lp);
     if (i === 0) {
-      // The journey line over Jupiter, then "Mission" and the name forming as Europa arrives.
+      // The journey line over Jupiter, then the name forming as Europa arrives (the title clock), then,
+      // on the opening clock, the label, the question, the callout line by line, and the first action.
       const it = reduced ? 99 : introT;
+      openingT = reduced ? 99 : Math.max(introT, TITLE[1] + (lp * f.len) / VH_PER_SECOND);
       setVar(f.el, "--journey", (smooth(0.8, 1.8, it) * (1 - smooth(3.6, 4.6, it)) * (1 - smooth(0.05, 0.3, lp))).toFixed(3));
+      setVar(f.el, "--act", smooth(OPENING.begin[0], OPENING.begin[1], openingT).toFixed(3));
       k = smooth(TITLE[0], TITLE[1], it);
-      inEnv = smooth(7.9, 9.0, it);
-      out = smooth(0.5, 0.92, lp);
+      inEnv = smooth(TITLE[1], TITLE[1] + 0.5, openingT);
+      out = smooth(0.55, 0.92, lp);
     } else {
       // First Contact waits for the breakthrough: the ocean is never announced before it is seen.
       const start = i === 3 ? 0.08 : 0;
-      k = smooth(start - 0.04, start + 0.45, lp);
-      inEnv = smooth(start + 0.04, start + 0.34, lp);
+      k = smooth(start - 0.02, start + 0.18, lp);
+      inEnv = smooth(start, start + 0.18, lp);
     }
     setVar(f.el, "--in", inEnv.toFixed(3));
     setVar(f.el, "--out", out.toFixed(3));
@@ -369,18 +518,17 @@ function overlay(p: number, depthM: number, a: Anchors): void {
         kk = reduced ? 1 : smooth(win[0], win[1], lp);
         if (win[2] !== undefined) o = Math.max(last ? replayOut : 0, smooth(win[2], win[3]!, lp));
       }
-      if (i === 0 && mode === "condense") kk = reduced ? 1 : smooth(7.2, 8.7, introT);
-      if (last && mode === "condense") kk = smooth(0.04, 0.36, lp);
-      let ring: { x: number; y: number; r: number } | undefined;
-      if (mode === "sonar") {
-        // The words appear where the ring has passed, and go back as it gathers in on the way up.
-        const rect = s.rect ?? { left: 0, top: 0 };
-        if (a.ring && a.ring.r > 0) ring = { x: a.ring.x - rect.left, y: a.ring.y - rect.top, r: a.ring.r };
-        else ring = { x: 0, y: 0, r: story.sweep >= 1 || reduced ? 4000 : 0 };
-        kk = ring.r > 0 ? 1 : 0;
+      if (i === 0 && mode === "fade") kk = reduced ? 1 : smooth(OPENING.question[0], OPENING.question[1], openingT);
+      if (last && mode === "fade") kk = smooth(0.02, 0.2, lp);
+      apply(mode, s, { k: kk, out: o, reduced });
+      // The teleprinter strikes: one soft tick for each letter that lands (only while typing forward).
+      if (mode === "transmit") {
+        const n = typed(kk, s.chars.length);
+        if (n > (struck.get(s) ?? 0) && o === 0 && !reduced) sound.tick();
+        struck.set(s, n);
       }
-      apply(mode, s, { k: kk, out: o, ring, plumeX: a.vent.visible ? a.vent.x : undefined, reduced });
     }
+    updateCallouts(f, lp, a.targets, openingT);
     if (last) {
       const draw = reduced ? 1 : smooth(0.46, 0.9, lp); // the record of the findings draws as the signal leaves
       if (draw !== lastDraw) for (const { el, len } of diagramLines) el.style.strokeDashoffset = (len * (1 - draw)).toFixed(1);
@@ -397,14 +545,17 @@ function overlay(p: number, depthM: number, a: Anchors): void {
   const range = story.scanRadius;
   write(sonarRangeEl, ((range * METRES_PER_UNIT) / 1000).toFixed(2));
 
-  place(anchors.crack, a.crack, p > 1.3 && p < 2.1);
-  place(anchors.anomaly, a.anomaly, story.anomalyFound && p > 4.1 && p < 5.35);
-  // The vent label hangs right unless it would leave the screen: the headline owns the left.
-  place(anchors.vent, a.vent, p > 5.45 && p < 6.0, 0.78);
 }
 
 // ───── Per-frame scene ─────
 
+const add3 = (a: readonly number[], b: readonly number[], s: number) => [a[0]! + b[0]! * s, a[1]! + b[1]! * s, a[2]! + b[2]! * s];
+/** A point on the open ice, high on the moon's face as the probe approaches (Arrival's first callout). */
+const ICE_POINT = (() => {
+  const v = [0.3, 0.4, 0.85];
+  const l = Math.hypot(...v);
+  return v.map((x) => x / l);
+})();
 const SPACE_GROUND = hexLinear("#010203");
 const OCEAN_GROUND = hexLinear("#06111a");
 const ICE = hexLinear("#c8eef0");
@@ -422,6 +573,19 @@ addEventListener("keydown", () => (hurried = true), { once: true });
 addEventListener("focusin", () => (hurried = true), { once: true });
 /** NEREID forms over these seconds of the intro clock: slow, so each slice of light can be watched. */
 const TITLE: readonly [number, number] = [4.6, 8.4];
+/** Scrolling moves the opening clock on: one second of it for every 6vh of scroll. */
+const VH_PER_SECOND = 6;
+/**
+ * After the name (seconds on the opening clock): the question, then the Europa callout once the question
+ * has been read, its lines one by one, then the first action once the last line has been read.
+ */
+const OPENING = (() => {
+  const question = [TITLE[1] + 0.6, TITLE[1] + 1.6] as const;
+  const callout = question[1] + readTime(words($(".tagline")), CLOCK_PACE);
+  const c = frames[0]!.callouts[0]!;
+  const begin = callout + c.sched.end + CLOCK_PACE.gap;
+  return { question, callout, begin: [begin, begin + 0.7] as const };
+})();
 const advanceIntro = (dt: number) => {
   if (!fontsReady) return;
   // A visitor who scrolls or uses the keyboard early skips ahead through the journey to Europa,
@@ -434,8 +598,8 @@ const advanceIntro = (dt: number) => {
 // after scrolling well back, so reversing never spams hits. Jumps (chapter links) pass silently.
 const POSITION_CUES: readonly { id: CueId; at: number; rearm: number }[] = [
   { id: "arrival-lock", at: 1.56, rearm: 1.3 }, // "Landing site identified" 
-  { id: "ice-breakthrough", at: 3.0, rearm: 2.6 },
-  { id: "discovery-reveal", at: 5.3, rearm: 4.9 }, // the plume rises into view
+  { id: "ice-breakthrough", at: 2.97, rearm: 2.6 }, // at the bottom of the beds' hush, just before the flash
+  { id: "discovery-reveal", at: 5.15, rearm: 4.9 }, // the swell grows as the plume rises into view
   { id: "transmission", at: 6.46, rearm: 6.2 }, // the signal leaves Europa
 ];
 const armed = POSITION_CUES.map(() => true);
@@ -460,6 +624,7 @@ function frameParams(info: FrameInfo): FrameParams {
   const aspect = info.width / Math.max(1, info.height);
   const shot = shoot(p, elapsed, aspect, introProgress());
   positionCues(p);
+  sound.world(shot.weights, story.speed, p);
   oceanTime += dt * (story.reducedMotion ? 0.12 : 0.6);
 
   // Ocean camera with gentle pointer parallax.
@@ -482,17 +647,13 @@ function frameParams(info: FrameInfo): FrameParams {
   // DOM anchors.
   const w = innerWidth;
   const h = innerHeight;
-  let ring: Anchors["ring"] = null;
-  if (story.pulse?.kind === "sweep" && shot.weights.ocean > 0.5) {
-    const c = ocean.project(PULSE_POINT, w, h);
-    const e = ocean.project([PULSE_POINT[0] + story.pulseRadius(), 0, PULSE_POINT[2]], w, h);
-    ring = { x: c.x, y: c.y, r: Math.hypot(e.x - c.x, e.y - c.y) };
-  }
+  const europaC = projectSpace(spaceCam, [0, 0, 0], w / h, w, h);
+  const europaEdge = projectSpace(spaceCam, spaceCam.right, w / h, w, h);
+  const europaR = Math.hypot(europaEdge.x - europaC.x, europaEdge.y - europaC.y);
   // The Transmission diagram rings Europa: centre and size from the projected disc.
   if (p > 6) {
-    const c = projectSpace(spaceCam, [0, 0, 0], w / h, w, h);
-    const edge = projectSpace(spaceCam, [spaceCam.right[0], spaceCam.right[1], spaceCam.right[2]], w / h, w, h);
-    const radiusPx = Math.hypot(edge.x - c.x, edge.y - c.y);
+    const c = europaC;
+    const radiusPx = europaR;
     setVar(diagram as unknown as HTMLElement, "--x", `${c.x.toFixed(1)}px`);
     setVar(diagram as unknown as HTMLElement, "--y", `${c.y.toFixed(1)}px`);
     // The inner ring (r 58 of 400) sits just outside the disc.
@@ -500,12 +661,54 @@ function frameParams(info: FrameInfo): FrameParams {
     const size = Math.max(240, (radiusPx * 1.25 * 400) / 58);
     setVar(diagram as unknown as HTMLElement, "--s", (Math.min(size, w < 700 ? 280 : Infinity) / 400).toFixed(3));
   }
-  overlay(p, shot.depthM, {
-    crack: projectSpace(spaceCam, DIVE_POINT, w / h, w, h),
-    anomaly: ocean.project([ANOMALY[0], 2.2, ANOMALY[1]], w, h),
-    vent: ocean.project([VENT[0], 8, VENT[2]], w, h),
-    ring,
-  });
+  // Callout targets. Europa carries its radius (callouts pin to a point on the disc); the lamp is fixed on screen.
+  const space = shot.weights.space > 0.5;
+  const inOcean = shot.weights.ocean > 0.5;
+  const oceanPt = (pt: [number, number, number]) => {
+    const r = ocean.project(pt, w, h);
+    return { ...r, visible: r.visible && inOcean };
+  };
+  const spacePt = (pt: readonly number[], show = space) => {
+    const r = projectSpace(spaceCam, pt, w / h, w, h);
+    return { ...r, visible: r.visible && show };
+  };
+  // Europa's callout points at the upper left of the disc (on phones, its bottom: the words sit under the moon).
+  const europaAt = w < 700 ? [0, 0.9] : [-0.5, -0.62];
+  const europa = {
+    x: europaC.x + europaAt[0]! * europaR,
+    y: europaC.y + europaAt[1]! * europaR,
+    visible: europaC.visible && space,
+  };
+  // Earth is above the frame on portrait screens: then the callout pins where the signal leaves the screen.
+  const earthRaw = projectSpace(spaceCam, add3(spaceCam.eye, EARTH_DIR, 1000), w / h, w, h);
+  const earth = { ...earthRaw, visible: space && shot.signal > 0.25 && europaC.visible };
+  if (earth.visible && !earthRaw.visible) {
+    const [x0, x1, y0, y1] = [24, w - 24, 96, h - 24];
+    const dx = earthRaw.x - europaC.x;
+    const dy = earthRaw.y - europaC.y;
+    let k = 1;
+    if (dx < 0) k = Math.min(k, (x0 - europaC.x) / dx);
+    if (dx > 0) k = Math.min(k, (x1 - europaC.x) / dx);
+    if (dy < 0) k = Math.min(k, (y0 - europaC.y) / dy);
+    if (dy > 0) k = Math.min(k, (y1 - europaC.y) / dy);
+    earth.x = europaC.x + dx * Math.max(0, k);
+    earth.y = europaC.y + dy * Math.max(0, k);
+  }
+  overlay(
+    p,
+    shot.depthM,
+    {
+      targets: {
+        europa,
+        ice: spacePt(ICE_POINT),
+        lamp: { x: w / 2, y: h * 0.56, visible: shot.weights.shaft > 0.6 },
+        water: oceanPt([-30, 0, -40]),
+        anomaly: oceanPt([ANOMALY[0], 2.2, ANOMALY[1]]),
+        vent: oceanPt([VENT[0], 8, VENT[2]]),
+        earth,
+      },
+    },
+  );
 
   const wO = shot.weights.ocean;
   const intro = story.reducedMotion ? 1 : smooth(0, 2.4, elapsed);
@@ -548,13 +751,14 @@ function fallback(reason: unknown): void {
   showStill(story.chapter);
   let prev = performance.now();
   const off = { x: 0, y: 0, visible: false };
+  const targets = { europa: off, ice: off, lamp: off, water: off, anomaly: off, vent: off, earth: off };
   const tick = (now: number) => {
     const dt = Math.min(0.1, (now - prev) / 1000);
     prev = now;
     elapsed += dt;
     advanceIntro(dt);
     handle(story.step(dt));
-    overlay(story.p, shoot(story.p, elapsed).depthM, { crack: off, anomaly: off, vent: off, ring: null });
+    overlay(story.p, shoot(story.p, elapsed).depthM, { targets });
     requestAnimationFrame(tick);
   };
   requestAnimationFrame(tick);

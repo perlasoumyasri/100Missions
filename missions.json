@@ -10,6 +10,16 @@
       "date": "2026-11-23",
       "tags": ["React", "8bitcn", "Pixel art", "Web Audio"],
       "thumbnail": "mission-001-design-oracle/docs/preview.png"
+    },
+    {
+      "number": 2,
+      "slug": "mission-002",
+      "dir": "mission-002-nereid",
+      "title": "NEREID",
+      "tagline": "A scroll-driven expedition beneath the ice of Jupiter's moon Europa, in WebGPU, with sound.",
+      "date": "2026-11-24",
+      "tags": ["WebGPU", "WGSL", "TypeScript", "Web Audio", "ElevenLabs"],
+      "thumbnail": "mission-002-nereid/docs/preview.png"
     }
   ]
 }

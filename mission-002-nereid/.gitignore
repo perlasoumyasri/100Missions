@@ -5,3 +5,5 @@ references/*.jpg
 references/*.jpeg
 references/*.webp
 *.tsbuildinfo
+# Dev-only sound audition: all candidate takes (only the picked ones ship, in public/sound/).
+audition/

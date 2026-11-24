@@ -50,6 +50,8 @@ Aim for mostly darkness and subdued cool tones, with small luminous areas. A res
 
 ## 04b / Typography system (supersedes 04 and the type decision in 09)
 
+> Later on 2026-11-24 the user found Bodoni unreadable for chapter headings over the moving scene. It now sets only the name NEREID; headings are Instrument Sans (see the mission CLAUDE.md).
+
 > The user's typography direction, 2026-11-24. The text down to "Avoid" is theirs, lightly formatted. Sizes as CSS `clamp()` values are in [design.md](design.md) 04.
 
 Take inspiration from Interstellar's monumental cinematic typography, Arrival's restraint, Alien's opening title choreography and NASA's scientific information design.

@@ -4,13 +4,14 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "BROWSER='google chrome' vite --open",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
     "test": "vitest run"
   },
   "dependencies": {
     "@fontsource-variable/bodoni-moda": "^5.3.0",
+    "@fontsource-variable/instrument-sans": "^5.3.0",
     "@fontsource/ibm-plex-mono": "^5.3.0",
     "@fontsource/ibm-plex-sans": "^5.3.0",
     "vgpu": "^0.6.0"
