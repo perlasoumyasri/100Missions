@@ -1,7 +1,7 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": null,
-  "installCommand": "echo \"Each mission installs its own dependencies during the build\"",
+  "installCommand": "echo \"Nothing to install: missions are prebuilt in site/\"",
   "buildCommand": "node scripts/build-site.mjs",
   "outputDirectory": "dist",
   "trailingSlash": true

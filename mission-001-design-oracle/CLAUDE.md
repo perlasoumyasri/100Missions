@@ -18,7 +18,7 @@ Instructions for working on this mission. They add to the root `CLAUDE.md` and o
 - **Key libraries:** Tailwind CSS v4, 8bitcn components (copied into `src/components/ui/8bit/`), Radix primitives, sonner (toasts), `@fontsource/vt323`.
 - **Audio:** Web Audio API, all sounds synthesised in `src/lib/sound.ts`.
 - **Package manager:** pnpm (lockfile committed).
-- **Build for the site:** the Vite default in `scripts/build-site.mjs` (`tsc -b` + `vite build --base=/mission-001/`).
+- **Build for the site:** the Vite default in `scripts/build-mission.mjs` (`tsc -b` + `vite build --base=/mission-001/`), output committed in `site/mission-001/`. Rebuild with `npm run build:mission -- 1` after any code change.
 
 ## Commands
 

@@ -10,6 +10,7 @@ This file holds only what is shared. **It sets no aesthetic, visual style or tec
 - `.claude/skills/`: shared craft skills, loaded only when relevant: `design-principles`, `art-direction`, `animation`, `library-discovery`, `visual-quality`, `ship-mission`.
 - `learnings.md`: reusable discoveries from past missions. Search it during discovery, and add to it when a mission ships.
 - `_template/`: starting files for a mission. `hub/`, `missions.json`, `scripts/`: the shared site and build.
+- `site/mission-NNN/`: each shipped mission's built output, made once by `npm run build:mission -- N` and committed. Vercel only copies these; it never builds missions. Don't read or edit files in `site/`.
 
 ## Mission isolation and context efficiency
 

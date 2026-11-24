@@ -30,7 +30,8 @@ Each mission is an independent project with its own idea, art direction, stack a
 │   ├── README.md          ← what it is, how to run it, what I learned
 │   └── ...                ← the project's code
 ├── hub/                   ← the mission board site
-└── scripts/               ← site build and new-mission scaffold
+├── site/                  ← each shipped mission's built website (built once, on ship)
+└── scripts/               ← new-mission scaffold, per-mission build, site assembly
 ```
 
 Start a new mission with `npm run new -- <number> <slug> "<Title>"`, then open Claude Code inside that mission's folder.

@@ -43,4 +43,4 @@ Reusable discoveries from each mission: libraries worth knowing, prompting techn
 
 ## Deployment and build
 
-- **One Vercel site for all missions** (Mission 001 + hub): `scripts/build-site.mjs` builds each shipped mission into `/mission-NNN/`. Only missions listed in `missions.json` are built, so unfinished ones stay locked on the hub.
+- **One Vercel site for all missions, prebuilt** (Mission 001 + hub): each mission is built once, locally, into a committed `site/mission-NNN/` (`npm run build:mission -- N`). Vercel only copies those folders and the hub, so deploys take seconds at any mission count and one broken mission can't block the rest. Only missions listed in `missions.json` are published, so unfinished ones stay locked on the hub.
