@@ -1,0 +1,7 @@
+node_modules/
+dist/
+# Third-party reference images stay local (inspiration only, not ours to publish). Our own renders are .png and are committed.
+references/*.jpg
+references/*.jpeg
+references/*.webp
+*.tsbuildinfo

@@ -1,10 +1,10 @@
-# Mission 002: Untitled
+# Mission 002: NEREID
 
 **Date:** 2026-11-24
 **Live:** https://100-missions.vercel.app/mission-002/
 **Tech:**
 
-![Untitled](docs/preview.png)
+![NEREID](docs/preview.png)
 
 ## 🎯 The mission
 
@@ -17,7 +17,7 @@ What I set out to build today, in one or two lines.
 ## ▶️ How to run it
 
 ```bash
-cd mission-002-untitled
+cd mission-002-nereid
 pnpm install
 pnpm dev
 ```

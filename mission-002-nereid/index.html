@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>NEREID: What is hiding beneath Europa's ice?</title>
+    <meta
+      name="description"
+      content="An unofficial, fictional expedition: a probe melts through Europa's ice to the hidden ocean beneath, and follows a warm signal. A WebGPU experience made for 100 Missions."
+    />
+    <meta name="theme-color" content="#03090e" />
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+  </head>
+  <body data-gpu="pending" data-chapter="0">
+    <a class="skip" href="#ch-7">Skip to the transmission</a>
+
+    <div class="stage" aria-hidden="true">
+      <img class="poster" alt="" width="1600" height="1000" decoding="async" />
+      <canvas class="world" id="world"></canvas>
+    </div>
+
+    <header class="masthead">
+      <p class="wordmark">NEREID</p>
+      <p class="masthead__flag">Unofficial concept</p>
+      <button class="sound" id="sound" type="button" aria-pressed="false">Sound <span data-sound-state>off</span></button>
+    </header>
+
+    <nav class="gauge" aria-label="Expedition chapters">
+      <ol class="gauge__list">
+        <li><a href="#ch-1"><span class="gauge__n">01</span><span class="gauge__label">The Mystery</span></a></li>
+        <li><a href="#ch-2"><span class="gauge__n">02</span><span class="gauge__label">Arrival</span></a></li>
+        <li><a href="#ch-3"><span class="gauge__n">03</span><span class="gauge__label">The Descent</span></a></li>
+        <li><a href="#ch-4"><span class="gauge__n">04</span><span class="gauge__label">First Contact</span></a></li>
+        <li><a href="#ch-5"><span class="gauge__n">05</span><span class="gauge__label">The Anomaly</span></a></li>
+        <li><a href="#ch-6"><span class="gauge__n">06</span><span class="gauge__label">The Discovery</span></a></li>
+        <li><a href="#ch-7"><span class="gauge__n">07</span><span class="gauge__label">The Transmission</span></a></li>
+      </ol>
+      <span class="gauge__marker" id="gauge-marker" aria-hidden="true"></span>
+      <p class="gauge__depth" aria-hidden="true"><span id="depth">0</span> m <span class="gauge__sim">sim.</span></p>
+    </nav>
+
+    <main>
+      <!-- Each chapter answers one question and raises the next. Status lines and actions carry a
+           data-window (chapter progress where they appear and leave), so they land on the visual event. -->
+      <section class="chapter" id="ch-1" aria-labelledby="t-1" style="--len: 150">
+        <div class="frame frame--1" data-frame="0">
+          <p class="journey">A journey to <em>Jupiter's moon.</em></p>
+          <p class="kicker">The expedition · Europa, moon of Jupiter</p>
+          <h1 class="title" id="t-1" data-kinetic="slices">NEREID</h1>
+          <p class="tagline" data-kinetic="condense">What is hiding beneath Europa's ice?</p>
+          <p class="narrative">Scientists believe there is a vast ocean beneath this frozen moon of Jupiter. But no spacecraft has ever reached it.</p>
+          <p class="narrative">Today, we're sending a probe to find out what's down there.</p>
+          <div class="begin">
+            <button class="cta" id="begin" type="button" data-go="1.5">Begin expedition <span class="cta__glyph" aria-hidden="true"></span></button>
+            <p class="hint" aria-hidden="true">or scroll</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="chapter" id="ch-2" aria-labelledby="t-2" style="--len: 170">
+        <div class="frame frame--2" data-frame="1">
+          <p class="index"><span>02</span> Arrival</p>
+          <h2 class="headline" id="t-2" data-kinetic="focus">From here, it looks <em>lifeless.</em></h2>
+          <p class="narrative">No trees. No rivers. Just ice stretching as far as we can see.</p>
+          <p class="narrative">But appearances can be deceiving. Those reddish cracks across Europa's surface could hold clues to what lies underneath.</p>
+          <p class="status" data-kinetic="transmit" data-window="0.52,0.66">Landing site identified. Preparing probe.</p>
+        </div>
+      </section>
+
+      <section class="chapter" id="ch-3" aria-labelledby="t-3" style="--len: 190">
+        <div class="frame frame--3" data-frame="2">
+          <p class="index"><span>03</span> The Descent</p>
+          <h2 class="headline" id="t-3" data-kinetic="lamp">How far down does <em>the ice go?</em></h2>
+          <p class="narrative">Our probe begins melting its way through the ice. As it descends, the sunlight disappears and the pressure builds.</p>
+          <p class="narrative">The instruments are still searching for water.</p>
+          <p class="readout" aria-hidden="true"><span id="shaft-depth">0</span><span class="readout__unit">m below the surface · simulated</span></p>
+          <p class="status" data-kinetic="transmit" data-window="0.74,0.86,0.97,1.02">Liquid water detected. Approaching ocean boundary.</p>
+        </div>
+      </section>
+
+      <section class="chapter" id="ch-4" aria-labelledby="t-4" style="--len: 120">
+        <div class="frame frame--4" data-frame="3">
+          <p class="index"><span>04</span> First Contact</p>
+          <h2 class="headline" id="t-4" data-kinetic="condense">We found <em>the ocean.</em></h2>
+          <p class="narrative">The probe breaks through the last layer of ice. Below us is an enormous body of water, completely hidden from the Sun.</p>
+          <p class="narrative">We switch on the lights. They barely reach beyond the probe.</p>
+          <p class="narrative narrative--ask" data-window="0.3,0.4">How do we explore something we cannot see?</p>
+          <div class="act" data-window="0.36,0.46">
+            <button class="cta" type="button" data-go="4.5">Activate sonar <span class="cta__glyph" aria-hidden="true"></span></button>
+          </div>
+        </div>
+      </section>
+
+      <section class="chapter" id="ch-5" aria-labelledby="t-5" style="--len: 140">
+        <div class="frame frame--5" data-frame="4">
+          <p class="index"><span>05</span> The Anomaly</p>
+          <h2 class="headline" id="t-5" data-kinetic="sonar">Wait. Why is the water getting <em>warmer?</em></h2>
+          <p class="narrative">Something unexpected appears in our readings. In this freezing ocean, there is a region where the water is unusually warm.</p>
+          <p class="narrative">Something beneath us could be releasing heat. We change course to investigate.</p>
+          <p class="annot" aria-hidden="true">Sonar range <span id="sonar-range">0.00</span> km · simulated</p>
+          <div class="act" data-window="0.46,0.56">
+            <button class="cta" type="button" data-go="5.55">Follow the heat signal <span class="cta__glyph" aria-hidden="true"></span></button>
+          </div>
+        </div>
+      </section>
+
+      <section class="chapter" id="ch-6" aria-labelledby="t-6" style="--len: 140">
+        <div class="frame frame--6" data-frame="5">
+          <p class="index"><span>06</span> The Discovery</p>
+          <h2 class="headline" id="t-6" data-kinetic="rise">Could this be where <em>life begins?</em></h2>
+          <p class="narrative">We've found an opening in the rocky ocean floor releasing warm, mineral-rich water. Scientists call this a hydrothermal vent.</p>
+          <p class="narrative">On Earth, entire communities of living organisms survive around similar vents, without sunlight.</p>
+          <p class="narrative narrative--ask" data-window="0.34,0.44">Could the same thing happen here?</p>
+          <p class="status" data-kinetic="transmit" data-window="0.46,0.62,0.97,1.02">Collecting water samples. Analysing chemical composition.</p>
+        </div>
+      </section>
+
+      <section class="chapter" id="ch-7" aria-labelledby="t-7" style="--len: 180">
+        <div class="frame frame--7" data-frame="6">
+          <p class="index"><span>07</span> The Transmission</p>
+          <h2 class="question" id="t-7" data-kinetic="condense">We haven't found life. <em>Not yet.</em></h2>
+          <p class="narrative">But we've found water, heat and minerals: some of the ingredients that could help life survive.</p>
+          <p class="narrative">We're sending our findings back to Earth.</p>
+          <div class="act" data-window="0.2,0.3,0.4,0.48">
+            <button class="cta" type="button" data-go="6.8">Transmit findings <span class="cta__glyph" aria-hidden="true"></span></button>
+          </div>
+          <p class="transmit" data-kinetic="transmit" data-window="0.44,0.66">Transmitting to Earth · signal delay 43 min · simulated</p>
+          <p class="narrative narrative--close" data-window="0.7,0.8">The next mission will know exactly where to look.</p>
+          <svg class="diagram" viewBox="0 0 400 400" aria-hidden="true">
+            <g class="diagram__rays"></g>
+            <circle class="diagram__ring" cx="200" cy="200" r="58" />
+            <circle class="diagram__ring diagram__ring--outer" cx="200" cy="200" r="132" />
+            <line class="diagram__axis" x1="40" y1="200" x2="360" y2="200" />
+          </svg>
+          <div class="end act" data-window="0.78,0.88">
+            <button class="cta cta--replay" id="replay" type="button">Replay the expedition <span class="cta__glyph" aria-hidden="true"></span></button>
+          </div>
+        </div>
+      </section>
+      <div class="runout" aria-hidden="true"></div>
+    </main>
+
+    <div class="anchor anchor--crack" id="anchor-crack" aria-hidden="true">
+      <span class="anchor__mark"></span><span class="anchor__leader"></span>
+      <span class="anchor__label">Landing site</span>
+    </div>
+    <div class="anchor anchor--warm" id="anchor-anomaly" aria-hidden="true">
+      <span class="anchor__mark"></span><span class="anchor__leader"></span>
+      <span class="anchor__label">Thermal anomaly<br /><span class="anchor__data">ΔT +3.1 K · <span data-anomaly-range>4.4 km</span> · simulated</span></span>
+    </div>
+    <div class="anchor anchor--warm" id="anchor-vent" aria-hidden="true">
+      <span class="anchor__mark"></span><span class="anchor__leader"></span>
+      <span class="anchor__label">Hydrothermal vent<br /><span class="anchor__data">T +11 °C · chemical gradient · simulated</span></span>
+    </div>
+
+    <footer class="fineprint">
+      <p>Unofficial concept. NEREID, its expedition and its discoveries are fictional, and not affiliated with NASA. Visuals and data are simulated.</p>
+      <p class="fineprint__credit">Mission 002 of 100 · built on vgpu</p>
+    </footer>
+
+    <p class="fallback-note" role="note">WebGPU isn't available in this browser, so you're seeing still frames. Try a recent Chrome, Edge or Safari for the live expedition.</p>
+    <p class="sr-only" id="live" aria-live="polite"></p>
+    <noscript><p class="fallback-note fallback-note--static">This experience needs JavaScript and WebGPU.</p></noscript>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
