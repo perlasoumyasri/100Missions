@@ -6,7 +6,7 @@ import { ANOMALY, ANOMALY_DISTANCE, CHAPTERS, METRES_PER_UNIT, Story, type Story
 import { hexLinear } from "./ocean/tuning";
 import type { FrameInfo, FrameParams, OceanRenderer } from "./ocean/renderer";
 import { createSound, type CueId } from "./sound";
-import { buildAt, buildStages, CLOCK_PACE, layoutCallout, readTime, schedule, SCROLL_PACE, wordAt, type Line, type Slot } from "./type/callouts";
+import { buildAt, buildStages, CLOCK_PACE, layoutCallout, readTime, schedule, wordAt, type Line, type Slot } from "./type/callouts";
 import { apply, split, type Mode, type Split } from "./type/kinetic";
 import { createConsole } from "./type/console";
 
@@ -42,6 +42,8 @@ interface Callout {
   /** Its lines, which arrive one at a time; a sentence's words come up one by one (a reading comes up whole). */
   lines: { el: HTMLElement; line: Line; words: HTMLElement[] }[];
   sched: ReturnType<typeof schedule>;
+  /** When the scroll reached it (story time, s), or -1: from then its words come up at reading pace. */
+  since: number;
   /** Build progress 0..1 of the ring, leader and shelf, and the measured size of the words. */
   k: number;
   /** Once placed, a callout holds its last position if its target leaves the screen, rather than vanishing. */
@@ -85,8 +87,9 @@ const frames: Frame[] = [...document.querySelectorAll<HTMLElement>(".frame")].ma
       lines,
       sched: schedule(
         lines.map((l) => l.line),
-        a === "intro" ? CLOCK_PACE : SCROLL_PACE,
+        CLOCK_PACE,
       ),
+      since: -1,
       el: c,
       at: c.dataset.at!,
       span: [a === "intro" ? null : Number(a), Number(b)] as const,
@@ -271,22 +274,27 @@ $("#replay").addEventListener("click", () => {
 // starts at the visitor's first click, tap or key press; the Sound button turns it off and on.
 const soundButton = $("#sound");
 let wantSound = localStorage.getItem("nereid-sound-on") !== "off";
+// The button tells the truth: browsers allow no sound until a click, tap or key press (scrolling doesn't
+// count), so until then it says "tap to start" rather than "on".
 const showSound = () => {
-  soundButton.setAttribute("aria-pressed", String(wantSound));
-  $("[data-sound-state]").textContent = wantSound ? "on" : "off";
+  const playing = wantSound && sound.enabled;
+  soundButton.setAttribute("aria-pressed", String(playing));
+  $("[data-sound-state]").textContent = playing ? "on" : wantSound ? "tap to start" : "off";
 };
 showSound();
 const startSound = (e: Event) => {
   if (!wantSound || sound.enabled || soundButton.contains(e.target as Node)) return;
-  void sound.enable();
+  void sound.enable().then(showSound);
 };
 for (const ev of ["pointerdown", "keydown", "touchend"] as const) addEventListener(ev, startSound, { passive: true });
 soundButton.addEventListener("click", () => {
+  // Wanted but not started yet: this click starts it. Otherwise the button toggles.
+  if (wantSound && !sound.enabled) return void sound.enable(true).then(showSound);
   wantSound = !wantSound;
   localStorage.setItem("nereid-sound-on", wantSound ? "on" : "off");
-  showSound();
-  if (wantSound) void sound.enable(true);
+  if (wantSound) void sound.enable(true).then(showSound);
   else sound.disable();
+  showSound();
 });
 
 const pointer = { x: 0, y: 0, sx: 0, sy: 0 };
@@ -386,7 +394,7 @@ const calloutViewport = () => {
   const h = innerHeight;
   const phone = w < 700;
   // The chapter gauge owns the right edge on wide screens; the masthead and fine print own top and bottom.
-  return { w: w - (w > 900 ? 130 : 0), h, gutter: Math.min(96, Math.max(20, w * 0.052)), top: phone ? 72 : 86, bottom: phone ? 180 : 140, phone }; // the console owns the bottom left
+  return { w: w - (w > 900 ? 130 : 0), h, gutter: Math.min(96, Math.max(20, w * 0.052)), top: phone ? 100 : 104, bottom: phone ? 100 : 76, phone }; // the console line sits under the masthead
 };
 
 /**
@@ -406,12 +414,19 @@ function updateCallouts(f: Frame, lp: number, targets: Anchors["targets"], openi
       const [start, end] = c.span;
       const span = end - (start ?? 0);
       const fold = clamp01((end - lp) / Math.min(CALLOUT_FOLD, span * 0.25));
-      // The Opening's callout runs on the opening clock (seconds); the others on the scroll (vh of it).
-      const b =
-        start === null
-          ? buildAt(openingT - OPENING.callout, c.sched, CLOCK_PACE)
-          : buildAt((lp - start) * f.len, c.sched, SCROLL_PACE);
+      // The scroll decides when a callout begins (the Opening's: its clock); from then its words come up
+      // at reading pace on their own, so they are seen arriving one by one however fast the visitor scrolls.
       const gate = c.gate !== "anomaly" || story.anomalyFound;
+      if (start !== null) {
+        if (lp >= start && lp < end && gate && t.visible) {
+          if (c.since < 0) c.since = story.time;
+        } else if (lp < start) c.since = -1;
+      }
+      const b = buildAt(
+        start === null ? openingT - OPENING.callout : c.since < 0 ? 0 : story.time - c.since,
+        c.sched,
+        CLOCK_PACE,
+      );
       const on = gate && (t.visible || c.placed) ? fold : 0;
       c.k = Math.min(b.structure, on);
       lines = b.lines.map((l) => Math.min(l, on));
@@ -455,7 +470,7 @@ function updateCallouts(f: Frame, lp: number, targets: Anchors["targets"], openi
   }
 }
 
-/** The probe's console (bottom left): the instruments' lines type out there, with a tick per letter. */
+/** The probe's console (under the masthead): the instruments' lines type out there, with a tick per letter. */
 const probeConsole = createConsole($("#console"), () => sound.tick());
 
 function overlay(p: number, depthM: number, a: Anchors): void {

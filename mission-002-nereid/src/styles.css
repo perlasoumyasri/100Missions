@@ -988,9 +988,11 @@ em {
   opacity: var(--l, 0);
 }
 
-/* A sentence's words come up one by one, in place, as if being read aloud (--w from main.ts). */
+/* A sentence's words come up one by one, in place, as if read aloud (--w from main.ts): each arrives in
+   the callout's colour and settles to white. */
 .callout__word {
   opacity: var(--w, 0);
+  color: color-mix(in oklab, var(--tone) calc((1 - var(--w, 0)) * 100%), var(--text));
 }
 
 [data-callouts="static"] .callout__word {
@@ -1047,53 +1049,47 @@ em {
   opacity: 1;
 }
 
-/* ───── The probe's console: the instruments report here, in one fixed place (type/console.ts) ───── */
+/* ───── The probe's console: one line under the masthead, on a plate so it reads over any scene ───── */
 .console {
   --cursor: rgb(139 227 245 / 0.85);
   position: fixed;
-  left: var(--gutter);
-  bottom: calc(clamp(14px, 2.6vh, 28px) + 30px);
-  z-index: 4;
-  display: grid;
-  gap: 6px;
-  max-width: min(46ch, calc(100vw - 2 * var(--gutter)));
+  top: calc(var(--top) + 36px);
+  left: 50%;
+  z-index: 5;
+  transform: translateX(-50%);
+  max-width: calc(100vw - 2 * var(--gutter));
   margin: 0;
-  padding: 0;
+  padding: 7px 14px;
   list-style: none;
+  border: 1px solid rgb(139 227 245 / 0.28);
+  border-radius: 4px;
+  background: rgb(3 9 14 / 0.72);
   font-family: var(--mono);
-  font-size: var(--fs-essential);
-  line-height: 1.4;
-  letter-spacing: 0.08em;
+  font-size: clamp(0.75rem, 0.7rem + 0.25vw, 0.9375rem);
+  line-height: 1.3;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
+  white-space: nowrap;
   color: var(--ice);
-  text-shadow:
-    0 0 14px rgb(3 9 14 / 0.95),
-    0 0 4px rgb(3 9 14 / 0.9);
   pointer-events: none;
 }
+.console[hidden] {
+  display: none;
+}
 .console li::before {
-  content: "> ";
+  content: "› ";
   color: var(--muted);
-}
-.console li.is-old {
-  opacity: 0.5;
-}
-.console li {
-  transition: opacity 0.6s var(--ease-out);
 }
 /* Teleprinter: a letter lands white-hot (--f = 1) and cools to cyan over the next two. */
 .console__ch {
   color: color-mix(in oklab, #fff calc(var(--f, 0) * 100%), var(--ice));
-  text-shadow: 0 0 calc(var(--f, 0) * 10px) rgb(139 227 245 / 0.9), 0 0 14px rgb(3 9 14 / 0.95);
+  text-shadow: 0 0 calc(var(--f, 0) * 10px) rgb(139 227 245 / 0.9);
 }
-/* On phones the fine print wraps to two lines: the console sits above it. */
 @media (max-width: 699px) {
   .console {
-    bottom: calc(clamp(14px, 2.6vh, 28px) + 48px);
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  .console li {
-    transition: none;
+    top: calc(var(--top) + 30px);
+    padding: 5px 10px;
+    font-size: 0.6875rem;
+    letter-spacing: 0.02em;
   }
 }

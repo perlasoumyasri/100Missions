@@ -25,21 +25,21 @@ export type CueId =
 
 /** Each cue: which sample, its loudness target (LUFS), optional pitch (rate), and how far it ducks the beds. */
 const CUES: Record<CueId, { sample: SampleId; target: number; rate?: number; duck?: number }> = {
-  "expedition-start": { sample: "10-ui-confirm", target: -27 },
-  "ui-confirm": { sample: "10-ui-confirm", target: -30 },
-  "reset": { sample: "10-ui-confirm", target: -30, rate: 0.8 }, // the confirm, lowered: a step back
+  "expedition-start": { sample: "10-ui-confirm", target: -19 },
+  "ui-confirm": { sample: "10-ui-confirm", target: -22 },
+  "reset": { sample: "10-ui-confirm", target: -22, rate: 0.8 }, // the confirm, lowered: a step back
   // The motif: the anomaly's two tones, a tone lower and quieter, first heard when the landing site locks.
-  "arrival-lock": { sample: "07-anomaly-lock", target: -29, rate: 0.89 },
-  "ice-breakthrough": { sample: "05-breakthrough", target: -24, duck: 3 },
-  "sonar-emit": { sample: "06-sonar", target: -25, duck: 4 },
-  "anomaly-lock": { sample: "07-anomaly-lock", target: -26 },
-  "discovery-reveal": { sample: "08-vent-swell", target: -25, duck: 3 },
-  "transmission": { sample: "09-transmission", target: -27, duck: 2 },
+  "arrival-lock": { sample: "07-anomaly-lock", target: -21, rate: 0.89 },
+  "ice-breakthrough": { sample: "05-breakthrough", target: -16, duck: 3 },
+  "sonar-emit": { sample: "06-sonar", target: -17, duck: 4 },
+  "anomaly-lock": { sample: "07-anomaly-lock", target: -18 },
+  "discovery-reveal": { sample: "08-vent-swell", target: -17, duck: 3 },
+  "transmission": { sample: "09-transmission", target: -19, duck: 2 },
 };
 
 const BEDS = { space: "01-space-bed", shaft: "02-ice-bed", ocean: "03-ocean-bed" } as const;
-/** Bed loudness at full weight (LUFS): quiet, but audible on laptop speakers; space a little the quietest. */
-const BED_TARGET = { space: -29, shaft: -28, ocean: -28 } as const;
+/** Bed loudness at full weight (LUFS): calm, but clearly audible on laptop speakers (−29 was not). */
+const BED_TARGET = { space: -19, shaft: -17, ocean: -17 } as const;
 type World = keyof typeof BEDS;
 const WORLDS = Object.keys(BEDS) as World[];
 
@@ -66,7 +66,7 @@ export function buildEngine(ctx: AudioContext) {
   const master = ctx.createGain();
   master.gain.value = 0;
   const limiter = ctx.createDynamicsCompressor();
-  limiter.threshold.value = -6;
+  limiter.threshold.value = -4;
   limiter.knee.value = 3;
   limiter.ratio.value = 12;
   limiter.attack.value = 0.003;
@@ -76,7 +76,7 @@ export function buildEngine(ctx: AudioContext) {
   const filter = ctx.createBiquadFilter();
   filter.type = "lowpass";
   filter.frequency.value = motion(0).cutoff;
-  filter.Q.value = 0.5;
+  filter.Q.value = 0.707;
   const lift = ctx.createGain();
   const duck = ctx.createGain();
   // The beds' first arrival: they grow out of near-silence (`rise`); cues and clicks are never held back.
@@ -205,7 +205,7 @@ export function buildEngine(ctx: AudioContext) {
       src.buffer = s.buffer;
       src.playbackRate.value = 0.92 + Math.random() * 0.16;
       const g = ctx.createGain();
-      g.gain.value = levelTo(s.lufs, -33);
+      g.gain.value = levelTo(s.lufs, -26);
       src.connect(g).connect(master);
       src.start(at, s.onset);
     },

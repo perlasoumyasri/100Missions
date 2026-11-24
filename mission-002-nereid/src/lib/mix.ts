@@ -67,12 +67,12 @@ export function bedGains(w: { space: number; shaft: number; ocean: number }, p: 
 /**
  * Traversal: the beds open up (brighter, a touch louder) while the camera moves, and settle when it
  * stops. Driven by the spring's smoothed speed, never by raw scroll events. Speed is story units per
- * second; a brisk scroll is about 0.5. At rest the beds keep enough upper range (1.8 kHz) for laptop
- * and phone speakers, which reproduce almost nothing below a few hundred hertz.
+ * second; a brisk scroll is about 0.5. At rest the beds keep their upper range (4 kHz): laptop and phone
+ * speakers reproduce almost nothing low, and a darker filter left the ice bed near silent (−38 dBFS).
  */
 export function motion(speed: number) {
   const m = clamp01(Math.abs(speed) / 0.5) ** 0.7;
-  return { cutoff: 1800 + 4200 * m, gain: dB(2 * m) };
+  return { cutoff: 4000 + 8000 * m, gain: dB(2 * m) };
 }
 
 /**

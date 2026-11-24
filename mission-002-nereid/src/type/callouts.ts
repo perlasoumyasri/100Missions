@@ -107,8 +107,8 @@ export function buildStages(k: number) {
 /**
  * Reading pace. People read one line at a time, word by word, so a callout's words come up one after
  * another at reading speed (`perWord`), and the next line waits a pause (`gap`) after the last word.
- * Readings (data lines) come up whole, in a short beat. The units are whatever drives the callout: vh of
- * scroll, or seconds on the Opening's clock.
+ * Readings (data lines) come up whole, in a short beat. In seconds: the scroll decides when a callout
+ * begins, and from then it runs at this pace, so the words are seen arriving however fast one scrolls.
  */
 export interface Pace {
   structure: number;
@@ -116,8 +116,7 @@ export interface Pace {
   gap: number;
   perWord: number;
 }
-export const SCROLL_PACE: Pace = { structure: 6, line: 3, gap: 10, perWord: 1.4 }; // vh
-export const CLOCK_PACE: Pace = { structure: 0.6, line: 0.3, gap: 1.2, perWord: 0.3 }; // seconds
+export const CLOCK_PACE: Pace = { structure: 0.6, line: 0.3, gap: 1.0, perWord: 0.26 }; // seconds
 
 export interface Line {
   words: number;

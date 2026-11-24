@@ -1,38 +1,24 @@
 /**
- * The probe's console: one fixed place where the instruments report, like a teleprinter log.
+ * The probe's console: one line under the masthead where the instruments report, like a teleprinter.
  *
- * Each line belongs to a story position (`data-at`, in P). When the visitor reaches it, the line types out
- * letter by letter at the machine's own steady pace (with a tick per letter), and it stays: it never
- * fades with its chapter, so it can always be read. The newest lines show, older ones dimmer above;
- * scrolling back removes the lines not yet reached. (The user found status lines that faded with their
- * chapter "disappear before I can read them", and couldn't tell where they would appear.)
+ * Each message belongs to a story position (`data-at`, in P). When the visitor reaches it, it types out
+ * letter by letter at the machine's own steady pace (a tick per letter) and stays until the next message
+ * replaces it. It never fades with its chapter, and it is always in the same place. (The user: status
+ * lines that faded with their chapter disappeared before they could be read, and a console in the corner
+ * sat on the buttons and was too small to read.) Scrolling back shows the earlier message, already typed.
  */
 
 /** Seconds per letter: a steady teleprinter rhythm, about 25 letters a second. */
 export const PER_CHAR = 0.04;
-/** How many lines the console shows at once. */
-export const SHOWN = 3;
 
-/** Indices of the lines reached at story position `p` that the console shows (the newest `max`). */
-export function visibleLines(ats: readonly number[], p: number, max = SHOWN): number[] {
-  const reached = ats.map((a, i) => (p >= a ? i : -1)).filter((i) => i >= 0);
-  return reached.slice(-max);
-}
+/** The newest message reached at story position `p`, or -1. */
+export const currentLine = (ats: readonly number[], p: number) => ats.reduce((cur, a, i) => (p >= a ? i : cur), -1);
 
-/** Letters of an `n`-letter line typed `elapsed` seconds after it was reached. */
+/** Letters of an `n`-letter message typed `elapsed` seconds after it arrived. */
 export const typedCount = (elapsed: number, n: number) => Math.max(0, Math.min(n, Math.floor(elapsed / PER_CHAR)));
 
-interface ConsoleLine {
-  el: HTMLElement;
-  at: number;
-  chars: HTMLElement[];
-  /** When it started typing (seconds), or -1 while not reached. */
-  since: number;
-  typed: number;
-}
-
 export function createConsole(root: HTMLElement, onStrike: () => void) {
-  const lines: ConsoleLine[] = [...root.querySelectorAll<HTMLElement>("[data-at]")].map((el) => {
+  const lines = [...root.querySelectorAll<HTMLElement>("[data-at]")].map((el) => {
     const text = el.textContent ?? "";
     el.textContent = "";
     const chars = [...text].map((c) => {
@@ -43,42 +29,52 @@ export function createConsole(root: HTMLElement, onStrike: () => void) {
       return span;
     });
     el.hidden = true;
-    return { el, at: Number(el.dataset.at), chars, since: -1, typed: 0 };
+    return { el, at: Number(el.dataset.at), chars };
   });
   const ats = lines.map((l) => l.at);
+  let current = -1;
+  let since = 0;
+  let typed = 0;
+
+  const paint = (n: number) => {
+    const l = lines[current]!;
+    // A letter strikes on white-hot and cools to cyan over the next two; a cursor waits for the next.
+    l.chars.forEach((c, j) => {
+      const lead = n - j;
+      const css =
+        j === n && n < l.chars.length
+          ? "opacity:1;color:transparent;background:var(--cursor)"
+          : `opacity:${lead > 0 ? 1 : 0};--f:${lead > 0 ? Math.max(0, 1 - (lead - 1) / 2).toFixed(2) : 0}`;
+      if (c.style.cssText !== css) c.style.cssText = css;
+    });
+  };
 
   return {
     /** Every frame: the story position, the time in seconds, and whether motion is reduced. */
     update(p: number, now: number, reduced: boolean) {
-      const show = new Set(visibleLines(ats, p));
-      lines.forEach((l, i) => {
-        const on = show.has(i);
-        if (!on) {
-          if (!l.el.hidden) l.el.hidden = true;
-          if (p < l.at) {
-            l.since = -1; // not reached: it types again when it is
-            l.typed = 0;
-          }
-          return;
-        }
-        if (l.el.hidden) l.el.hidden = false;
-        if (l.since < 0) l.since = now;
-        const n = reduced ? l.chars.length : typedCount(now - l.since, l.chars.length);
-        const newest = i === Math.max(...show);
-        l.el.classList.toggle("is-old", !newest);
-        if (n === l.typed && n === l.chars.length) return;
-        if (n > l.typed && !reduced) onStrike();
-        l.typed = n;
-        // A letter strikes on white-hot and cools to cyan over the next two; a cursor waits for the next.
-        l.chars.forEach((c, j) => {
-          const lead = n - j;
-          const css =
-            j === n && n < l.chars.length
-              ? "opacity:1;color:transparent;background:var(--cursor)"
-              : `opacity:${lead > 0 ? 1 : 0};--f:${lead > 0 ? Math.max(0, 1 - (lead - 1) / 2).toFixed(2) : 0}`;
-          if (c.style.cssText !== css) c.style.cssText = css;
-        });
-      });
+      const next = currentLine(ats, p);
+      if (next !== current) {
+        if (current >= 0) lines[current]!.el.hidden = true;
+        const forward = next > current;
+        current = next;
+        root.hidden = current < 0;
+        if (current < 0) return;
+        lines[current]!.el.hidden = false;
+        since = now;
+        // Going forward it types; going back, the earlier message is simply there.
+        typed = forward && !reduced ? 0 : lines[current]!.chars.length;
+        paint(typed);
+        return;
+      }
+      if (current < 0) return;
+      const n = lines[current]!.chars.length;
+      if (typed >= n) return;
+      const t = typedCount(now - since, n);
+      if (t > typed) {
+        onStrike();
+        typed = t;
+        paint(t);
+      }
     },
   };
 }

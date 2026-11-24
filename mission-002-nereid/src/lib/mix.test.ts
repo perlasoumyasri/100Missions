@@ -34,9 +34,9 @@ describe("bedGains", () => {
 
 describe("motion", () => {
   it("is dark and unboosted at rest, open while moving, and capped", () => {
-    expect(motion(0)).toEqual({ cutoff: 1800, gain: 1 });
-    expect(motion(-0.5).cutoff).toBeCloseTo(6000);
-    expect(motion(5).cutoff).toBeCloseTo(6000);
+    expect(motion(0)).toEqual({ cutoff: 4000, gain: 1 });
+    expect(motion(-0.5).cutoff).toBeCloseTo(12000);
+    expect(motion(5).cutoff).toBeCloseTo(12000);
   });
 });
 

@@ -47,7 +47,7 @@ copy.md               the copy, chapter by chapter
 
 ## 💡 What I learned
 
-- Pace the text in units of scroll, not chapter percentages. A rule like "4vh plus 0.9vh per word" stays readable when a chapter gets longer.
+- Let the scroll decide when text begins, then let it run at reading pace. Text driven purely by scroll distance appears all at once on a trackpad flick.
 - An automated audit of when each text element forms (10 % to 90 % visible) against the story position finds every overlap in one run.
 - Browsers allow no sound before a click, and scrolling doesn't count. Plan the opening around that.
 - Generated ambience mixed for headphones disappears on laptop speakers. Measure the actual output level, and keep some top end.

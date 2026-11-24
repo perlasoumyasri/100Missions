@@ -39,15 +39,15 @@
       <p class="gauge__depth" aria-hidden="true"><span id="depth">0</span> m <span class="gauge__sim">sim.</span></p>
     </nav>
 
-    <!-- The probe's console: its instruments report here, in one fixed place. Each line types out when the
-         story reaches its position (data-at, in chapters) and stays until newer lines replace it. -->
-    <ol class="console" id="console" role="log" aria-label="Probe log">
+    <!-- The probe's console: one line under the masthead where the instruments report. Each message types
+         out when the story reaches its position (data-at, in chapters) and stays until the next one. -->
+    <ol class="console" id="console" role="log" aria-label="Probe log" hidden>
       <li data-at="1.57">Landing site identified. Preparing probe.</li>
       <li data-at="2.69">Ice thinning. Liquid water detected below.</li>
       <li data-at="3.02">Ice breached. Probe in liquid water.</li>
-      <li data-at="4.36">Thermal anomaly detected · <span data-anomaly-range>4.4 km</span> ahead · simulated</li>
-      <li data-at="5.74">Collecting water samples. Analysing chemical composition.</li>
-      <li data-at="6.47">Transmitting to Earth · signal delay 43&nbsp;min · simulated</li>
+      <li data-at="4.36">Thermal anomaly · <span data-anomaly-range>4.4 km</span> ahead · simulated</li>
+      <li data-at="5.74">Collecting water samples. Analysing chemistry.</li>
+      <li data-at="6.47">Transmitting to Earth · delay 43&nbsp;min · simulated</li>
     </ol>
 
     <main>
