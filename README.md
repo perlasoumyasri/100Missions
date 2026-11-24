@@ -14,14 +14,26 @@ Each mission is a self-contained project in its own folder, and every one gets p
 
 ## 📁 Structure
 
+Each mission is an independent project with its own idea, art direction, stack and dependencies. They share a workflow and a quality bar, not a style.
+
 ```
 100Missions/
+├── CLAUDE.md              ← shared workflow and engineering standards
+├── .claude/skills/        ← design, art direction, animation, library discovery, visual quality, shipping
+├── learnings.md           ← reusable discoveries from every mission
+├── _template/             ← starting files for a new mission
 ├── mission-001-<name>/
-│   ├── README.md      ← what it is, how to run it, what I learned
-│   └── ...            ← the project's code
-├── mission-002-<name>/
-└── ...
+│   ├── CLAUDE.md          ← this mission's instructions, stack and decisions
+│   ├── brief.md           ← what and why
+│   ├── art-direction.md   ← how it looks, moves and sounds
+│   ├── references/        ← reference images and sources
+│   ├── README.md          ← what it is, how to run it, what I learned
+│   └── ...                ← the project's code
+├── hub/                   ← the mission board site
+└── scripts/               ← site build and new-mission scaffold
 ```
+
+Start a new mission with `npm run new -- <number> <slug> "<Title>"`, then open Claude Code inside that mission's folder.
 
 ## 🔗 Follow along
 

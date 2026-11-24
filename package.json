@@ -4,6 +4,7 @@
   "type": "module",
   "scripts": {
     "build": "node scripts/build-site.mjs",
-    "preview": "npx --yes serve dist"
+    "preview": "npx --yes serve dist",
+    "new": "node scripts/new-mission.mjs"
   }
 }
