@@ -13,7 +13,8 @@ This file holds only what is shared. **It sets no aesthetic, visual style or tec
 
 ## Mission isolation and context efficiency
 
-- Each mission is an independent application. Sessions start in the mission folder (`cd mission-NNN-<slug> && claude`), one fresh session per mission.
+- Each mission is an independent application. Use one fresh session per mission, opened at the repo root or inside the mission folder.
+- When the user says "mission N" (e.g. "work on mission 2"), the active mission is `mission-NNN-*/`. Read its `CLAUDE.md` first and stay inside that folder. If it doesn't exist yet, scaffold it (see Workflow) after confirming the slug and title.
 - Restrict all exploration, file reads, searches and modifications to the active mission directory.
 - Never scan, summarize or analyze previous missions unless explicitly requested. Never carry one mission's style, palette, libraries or code into another by default.
 - Never perform repository-wide exploration unnecessarily. Shared files (`learnings.md`, `missions.json`, `README.md`) are read or edited only for a specific step.
