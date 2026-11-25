@@ -483,7 +483,9 @@ function overlay(p: number, depthM: number, a: Anchors): void {
           : Math.max(introT, TITLE[1] + (Math.max(0, lp - lpAtTitle) * f.len) / VH_PER_SECOND);
       setVar(f.el, "--journey", (smooth(0.8, 1.8, it) * (1 - smooth(3.6, 4.6, it)) * (1 - smooth(0.05, 0.3, lp))).toFixed(3));
       setVar(f.el, "--act", smooth(OPENING.begin[0], OPENING.begin[1], openingT).toFixed(3));
-      k = smooth(TITLE[0], TITLE[1], it);
+      // Linear, not eased: an eased clock crawls at the end, so the last letters (I, D) formed slowly and
+      // unevenly. Each letter carries its own ease (kinetic.ts), so the name forms at an even cadence.
+      k = clamp01((it - TITLE[0]) / (TITLE[1] - TITLE[0]));
       inEnv = smooth(TITLE[1], TITLE[1] + 0.5, openingT);
       out = smooth(0.8, 0.98, lp);
     } else {
