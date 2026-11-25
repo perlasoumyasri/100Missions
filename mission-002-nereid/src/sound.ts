@@ -71,10 +71,7 @@ export function buildEngine(ctx: AudioContext) {
   limiter.ratio.value = 12;
   limiter.attack.value = 0.003;
   limiter.release.value = 0.25;
-  // +6 dB of make-up after the limiter: laptop speakers need it (the user heard nothing at the levels below).
-  const makeup = ctx.createGain();
-  makeup.gain.value = dB(6);
-  master.connect(limiter).connect(makeup).connect(ctx.destination);
+  master.connect(limiter).connect(ctx.destination);
 
   const filter = ctx.createBiquadFilter();
   filter.type = "lowpass";

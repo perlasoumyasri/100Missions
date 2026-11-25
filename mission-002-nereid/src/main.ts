@@ -459,7 +459,8 @@ function overlay(p: number, depthM: number, a: Anchors): void {
   frames.forEach((f, i) => {
     const lp = p - i;
     const last = i === CHAPTERS - 1;
-    const near = lp > -0.25 && lp < 1.05;
+    // A little past its end too: some callouts carry into the next chapter until its own callout arrives.
+    const near = lp > -0.25 && lp < 1.2;
     const wasLive = f.el.classList.contains("is-live");
     if (wasLive !== near) f.el.classList.toggle("is-live", near);
     if (!near) return;
