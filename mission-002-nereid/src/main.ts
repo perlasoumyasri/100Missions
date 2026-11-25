@@ -445,7 +445,12 @@ function updateCallouts(f: Frame, lp: number, targets: Anchors["targets"], openi
       c.k = Math.min(b.structure, on);
       text = Math.min(b.text, on);
     } else {
-      c.k = lp > -0.1 && lp < 1 ? 1 : 0;
+      // The Opening's callout still waits for its moment, so it never lands on the journey line or the name.
+      const due = c.span[0] === null ? openingT >= OPENING.callout : true;
+      // In the text column only once the previous chapter's heading has left (it fades out by 0.99), and
+      // gone again before the next one comes in.
+      const inColumn = c.span[0] === null ? lp < 0.97 : lp > 0.02 && lp < 0.97;
+      c.k = due && inColumn ? 1 : 0;
       text = c.k;
     }
     if (c.k === 0) [c.placed, c.words] = [false, null];

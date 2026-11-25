@@ -699,7 +699,8 @@ em {
   position: fixed;
   top: calc(var(--top) + 40px);
   left: var(--gutter);
-  max-width: 44ch;
+  right: var(--gutter);
+  max-width: 100ch; /* one line on laptops, so it stays above the chapter's label on short screens */
   z-index: 4;
   display: none;
   font-family: var(--mono);
@@ -1024,6 +1025,10 @@ em {
 /* No WebGPU, or reduced motion: no leaders. The chapter's callouts sit in its text column, whole. */
 [data-callouts="static"] .callout {
   position: static;
+  visibility: hidden;
+}
+
+[data-callouts="static"] .callout.is-on {
   visibility: inherit;
 }
 
