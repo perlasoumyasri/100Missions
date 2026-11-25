@@ -261,7 +261,24 @@ $("#replay").addEventListener("click", () => {
 // Sound is on by default (a remembered preference). Browsers allow no audio before a gesture, so it
 // starts at the visitor's first click, tap or key press; the Sound button turns it off and on.
 const soundButton = $("#sound");
-let wantSound = localStorage.getItem("nereid-sound-on") !== "off";
+// Saved settings are a convenience: where storage is blocked (private windows, embedded frames) they are skipped.
+const saved = {
+  get: (k: string) => {
+    try {
+      return localStorage.getItem(k);
+    } catch {
+      return null;
+    }
+  },
+  set: (k: string, v: string) => {
+    try {
+      localStorage.setItem(k, v);
+    } catch {
+      // not kept; the setting still applies for this visit
+    }
+  },
+};
+let wantSound = saved.get("nereid-sound-on") !== "off";
 // Sound is on by default (the user's choice: it starts quiet and rises slowly, so there is time to turn it
 // off). It is tried at once; browsers that still need a click, tap or key press start it on the first one.
 const soundHint = $("#sound-hint");
@@ -289,7 +306,7 @@ soundButton.addEventListener("click", () => {
   // Wanted but not started yet: this click starts it. Otherwise the button toggles.
   if (wantSound && !sound.enabled) return void sound.enable(true).then(showSound);
   wantSound = !wantSound;
-  localStorage.setItem("nereid-sound-on", wantSound ? "on" : "off");
+  saved.set("nereid-sound-on", wantSound ? "on" : "off");
   if (wantSound) void sound.enable(true).then(showSound);
   else sound.disable();
   showSound();
