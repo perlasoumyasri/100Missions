@@ -75,7 +75,7 @@ export function layoutCallout(t: Pt, box: { w: number; h: number }, vp: Viewport
   let corner: Pt;
   let shelfOnTop: boolean;
   if (vp.phone) {
-    text = { x: clamp((vp.w - box.w) / 2, minX, maxX), y: clamp(slot.phoneTop * vp.h, minY, maxY) };
+    text = words ?? { x: clamp((vp.w - box.w) / 2, minX, maxX), y: clamp(slot.phoneTop * vp.h, minY, maxY) };
     shelfOnTop = true;
     corner = { x: clamp(t.x, text.x, text.x + box.w), y: text.y };
   } else {
@@ -108,8 +108,11 @@ export function layoutCallout(t: Pt, box: { w: number; h: number }, vp: Viewport
 const hits = (a: Pt, box: { w: number; h: number }, r: Rect) =>
   a.x < r.x + r.w + CLEAR && a.x + box.w > r.x - CLEAR && a.y < r.y + r.h + CLEAR && a.y + box.h > r.y - CLEAR;
 
+/** Are the words at `at` clear of every rectangle (with the margin)? */
+export const isClear = (at: Pt, box: { w: number; h: number }, rects: Rect[]) => !rects.some((r) => hits(at, box, r));
+
 /** Does the straight leader from a to b pass through r (with a few px to spare)? */
-const crosses = (a: Pt, b: Pt, r: Rect) => {
+export const crosses = (a: Pt, b: Pt, r: Rect) => {
   for (let i = 1; i < 32; i++) {
     const x = a.x + ((b.x - a.x) * i) / 32;
     const y = a.y + ((b.y - a.y) * i) / 32;
@@ -119,7 +122,7 @@ const crosses = (a: Pt, b: Pt, r: Rect) => {
 };
 
 /**
- * Where a callout's words go when it first appears (desktop): its slot, unless the words or the leader
+ * Where a callout's words go when it first appears: its slot, unless the words or the leader
  * from the target would cross the chapter's text (heading, label, status, narrative), which a wide but
  * short window or a target sitting by the heading can cause. Then the nearest spot right of, above or
  * below that text where both are clear. The caller keeps the answer while the callout shows, so the
@@ -127,14 +130,16 @@ const crosses = (a: Pt, b: Pt, r: Rect) => {
  */
 export function placeWords(t: Pt, box: { w: number; h: number }, vp: Viewport, slot: Slot, keepClear: Rect[]): Pt {
   const home = layoutCallout(t, box, vp, slot).text;
-  if (vp.phone || keepClear.length === 0) return home;
+  if (keepClear.length === 0) return home;
   const minX = vp.gutter;
   const maxX = vp.w - vp.gutter - box.w;
   const minY = vp.top;
   const maxY = vp.h - vp.bottom - box.h;
   const options: Pt[] = [home];
   for (const r of keepClear) {
-    options.push({ x: r.x + r.w + CLEAR, y: home.y }, { x: home.x, y: r.y - CLEAR - box.h }, { x: home.x, y: r.y + r.h + CLEAR });
+    // On phones the words span the width, so they can only move up or down.
+    if (!vp.phone) options.push({ x: r.x + r.w + CLEAR, y: home.y });
+    options.push({ x: home.x, y: r.y - CLEAR - box.h }, { x: home.x, y: r.y + r.h + CLEAR });
   }
   let best = home;
   let bestScore = Infinity;

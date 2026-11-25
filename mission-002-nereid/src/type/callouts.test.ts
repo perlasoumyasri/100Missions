@@ -37,6 +37,13 @@ describe("layoutCallout", () => {
     expect(layoutCallout({ x: 0, y: 0 }, box, desk, low, { x: 420, y: 202 }).text).toEqual({ x: 420, y: 202 });
   });
 
+  it("on phones, moves the words up or down, clear of the chapter's text", () => {
+    const label = { x: 20, y: 320, w: 200, h: 20 };
+    const p = placeWords({ x: 300, y: 100 }, { w: 350, h: 90 }, phone, { ...slot, phoneTop: 0.4 }, [label]);
+    expect(p.x).toBe(20);
+    expect(p.y + 90 <= label.y - 18 || p.y >= label.y + label.h + 18).toBe(true);
+  });
+
   it("stays inside the safe area", () => {
     for (const s of [{ ...slot, x: 0, y: 0 }, { ...slot, x: 1, y: 1, up: false }]) {
       const p = layoutCallout({ x: 0, y: 0 }, box, desk, s);

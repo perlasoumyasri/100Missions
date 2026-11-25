@@ -6,7 +6,7 @@ import { ANOMALY, ANOMALY_DISTANCE, CHAPTERS, METRES_PER_UNIT, Story, type Story
 import { hexLinear } from "./ocean/tuning";
 import type { FrameInfo, FrameParams, OceanRenderer } from "./ocean/renderer";
 import { createSound, type CueId } from "./sound";
-import { buildAt, buildStages, layoutCallout, placeWords, readSeconds, type Pt as Point, type Rect, type Slot } from "./type/callouts";
+import { buildAt, buildStages, crosses, isClear, layoutCallout, placeWords, readSeconds, type Pt as Point, type Rect, type Slot } from "./type/callouts";
 import { apply, split, type Mode, type Split } from "./type/kinetic";
 import { createStatuses } from "./type/status";
 
@@ -47,6 +47,8 @@ interface Callout {
   placed: boolean;
   /** Where its words sit while it shows (chosen when it appears, clear of the chapter's text). */
   words: Point | null;
+  /** The leader's and ring's visibility, 0..1: they fade while a moving target would cross the chapter's text. */
+  lead: number;
   w: number;
   h: number;
 }
@@ -80,6 +82,7 @@ const frames: Frame[] = [...document.querySelectorAll<HTMLElement>(".frame")].ma
       k: 0,
       placed: false,
       words: null,
+      lead: 1,
       w: 0,
       h: 0,
     };
@@ -454,8 +457,13 @@ function updateCallouts(f: Frame, lp: number, targets: Anchors["targets"], openi
       if (!c.words) {
         const next = c.span[1] > 1 ? (frames[frames.indexOf(f) + 1]?.text ?? []) : [];
         c.words = placeWords(t, c, vp, c.slot, [...f.text, ...next]);
+        // Small phones may have no spot clear of both chapters: then its own chapter's text comes first.
+        if (next.length && !isClear(c.words, c, f.text)) c.words = placeWords(t, c, vp, c.slot, f.text);
       }
       const pl = layoutCallout(t, c, vp, c.slot, c.words ?? undefined);
+      const over = [...f.text, ...(lp > 1 ? (frames[frames.indexOf(f) + 1]?.text ?? []) : [])].some((r) => crosses(t, pl.corner, r));
+      c.lead += ((over ? 0 : 1) - c.lead) * 0.18;
+      setVar(c.el, "--lead", c.lead.toFixed(3));
       const px = (v: number) => `${v.toFixed(1)}px`;
       setVar(c.el, "--x", px(t.x));
       setVar(c.el, "--y", px(t.y));

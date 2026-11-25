@@ -780,6 +780,11 @@ em {
   .fineprint__credit {
     display: none;
   }
+
+  /* The fine print wraps to three lines on phones: the depth readout sits clear above it. */
+  .gauge {
+    bottom: 92px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -901,7 +906,7 @@ em {
   height: 10px;
   border: 1px solid var(--tone);
   border-radius: 50%;
-  opacity: var(--mark, 0);
+  opacity: calc(var(--mark, 0) * var(--lead, 1));
   transform: translate3d(var(--x, 0), var(--y, 0), 0) scale(calc(0.4 + 0.6 * var(--mark, 0)));
 }
 
@@ -924,6 +929,7 @@ em {
   background: var(--tone);
   transform-origin: 0 50%;
   transform: translate3d(var(--lx, 0), var(--ly, 0), 0) rotate(var(--la, 0rad)) scaleX(calc(var(--ll, 0) * var(--leg, 0)));
+  opacity: var(--lead, 1); /* fades while a moving target would draw it across the chapter's text */
 }
 
 .callout__text {
