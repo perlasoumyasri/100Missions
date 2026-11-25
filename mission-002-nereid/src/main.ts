@@ -6,7 +6,7 @@ import { ANOMALY, ANOMALY_DISTANCE, CHAPTERS, METRES_PER_UNIT, Story, type Story
 import { hexLinear } from "./ocean/tuning";
 import type { FrameInfo, FrameParams, OceanRenderer } from "./ocean/renderer";
 import { createSound, type CueId } from "./sound";
-import { buildAt, buildStages, layoutCallout, readSeconds, type Rect, type Slot } from "./type/callouts";
+import { buildAt, buildStages, layoutCallout, placeWords, readSeconds, type Pt as Point, type Rect, type Slot } from "./type/callouts";
 import { apply, split, type Mode, type Split } from "./type/kinetic";
 import { createStatuses } from "./type/status";
 
@@ -45,6 +45,8 @@ interface Callout {
   k: number;
   /** Once placed, a callout holds its last position if its target leaves the screen, rather than vanishing. */
   placed: boolean;
+  /** Where its words sit while it shows (chosen when it appears, clear of the chapter's text). */
+  words: Point | null;
   w: number;
   h: number;
 }
@@ -77,6 +79,7 @@ const frames: Frame[] = [...document.querySelectorAll<HTMLElement>(".frame")].ma
       text: c.querySelector<HTMLElement>(".callout__text")!,
       k: 0,
       placed: false,
+      words: null,
       w: 0,
       h: 0,
     };
@@ -149,6 +152,7 @@ const measure = () => {
       return { x: r.left, y: r.top, w: r.width, h: r.height };
     });
     for (const c of f.callouts) {
+      c.words = null; // re-chosen for the new layout
       c.w = c.text.offsetWidth;
       c.h = c.text.offsetHeight;
     }
@@ -424,14 +428,17 @@ function updateCallouts(f: Frame, lp: number, targets: Anchors["targets"], openi
       c.k = lp > -0.1 && lp < 1 ? 1 : 0;
       text = c.k;
     }
-    if (c.k === 0) c.placed = false;
+    if (c.k === 0) [c.placed, c.words] = [false, null];
     if (before === 0 && c.k === 0) continue;
     if (c.el.classList.contains("is-on") !== c.k > 0) c.el.classList.toggle("is-on", c.k > 0);
     if (pinned && t.visible) {
       c.placed = true;
       // Clear of its own chapter's text and, while it carries over, of the next chapter's too.
-      const next = c.span[1] > 1 ? (frames[frames.indexOf(f) + 1]?.text ?? []) : [];
-      const pl = layoutCallout(t, c, vp, c.slot, [...f.text, ...next]);
+      if (!c.words) {
+        const next = c.span[1] > 1 ? (frames[frames.indexOf(f) + 1]?.text ?? []) : [];
+        c.words = placeWords(t, c, vp, c.slot, [...f.text, ...next]);
+      }
+      const pl = layoutCallout(t, c, vp, c.slot, c.words ?? undefined);
       const px = (v: number) => `${v.toFixed(1)}px`;
       setVar(c.el, "--x", px(t.x));
       setVar(c.el, "--y", px(t.y));

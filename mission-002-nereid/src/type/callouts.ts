@@ -66,7 +66,7 @@ const clamp = (x: number, lo: number, hi: number) => Math.min(Math.max(x, lo), M
  * Place a callout. The words sit in a fixed slot (clamped into the safe area); the leader runs from the
  * target to the shelf. On phones the leader meets the top of the words under the target's x.
  */
-export function layoutCallout(t: Pt, box: { w: number; h: number }, vp: Viewport, slot: Slot, keepClear: Rect[] = []): Placement {
+export function layoutCallout(t: Pt, box: { w: number; h: number }, vp: Viewport, slot: Slot, words?: Pt): Placement {
   const minX = vp.gutter;
   const maxX = vp.w - vp.gutter - box.w;
   const minY = vp.top;
@@ -86,7 +86,7 @@ export function layoutCallout(t: Pt, box: { w: number; h: number }, vp: Viewport
       y: clamp(slot.up ? cy - box.h : cy, minY, maxY),
     };
     shelfOnTop = !slot.up;
-    text = clearOf(text, box, keepClear, { minX, maxX, minY, maxY });
+    if (words) text = words;
     corner = { x: slot.side > 0 ? text.x : text.x + box.w, y: shelfOnTop ? text.y : text.y + box.h };
   }
 
@@ -108,24 +108,42 @@ export function layoutCallout(t: Pt, box: { w: number; h: number }, vp: Viewport
 const hits = (a: Pt, box: { w: number; h: number }, r: Rect) =>
   a.x < r.x + r.w + CLEAR && a.x + box.w > r.x - CLEAR && a.y < r.y + r.h + CLEAR && a.y + box.h > r.y - CLEAR;
 
-/**
- * On a wide but short window a slot can land on the chapter's heading. Then the words move to the nearest
- * spot (right of, above or below a piece of the chapter's text) that is clear of all of it and inside the
- * safe area. The rectangles are fixed for a layout, so the words still never move while they show.
- */
-function clearOf(at: Pt, box: { w: number; h: number }, rects: Rect[], b: { minX: number; maxX: number; minY: number; maxY: number }): Pt {
-  if (!rects.some((r) => hits(at, box, r))) return at;
-  const options: Pt[] = [];
-  for (const r of rects) {
-    options.push({ x: r.x + r.w + CLEAR, y: at.y }, { x: at.x, y: r.y - CLEAR - box.h }, { x: at.x, y: r.y + r.h + CLEAR });
+/** Does the straight leader from a to b pass through r (with a few px to spare)? */
+const crosses = (a: Pt, b: Pt, r: Rect) => {
+  for (let i = 1; i < 32; i++) {
+    const x = a.x + ((b.x - a.x) * i) / 32;
+    const y = a.y + ((b.y - a.y) * i) / 32;
+    if (x > r.x - 6 && x < r.x + r.w + 6 && y > r.y - 6 && y < r.y + r.h + 6) return true;
   }
-  let best = at;
-  let bestD = Infinity;
+  return false;
+};
+
+/**
+ * Where a callout's words go when it first appears (desktop): its slot, unless the words or the leader
+ * from the target would cross the chapter's text (heading, label, status, narrative), which a wide but
+ * short window or a target sitting by the heading can cause. Then the nearest spot right of, above or
+ * below that text where both are clear. The caller keeps the answer while the callout shows, so the
+ * words never move; only the leader follows the target.
+ */
+export function placeWords(t: Pt, box: { w: number; h: number }, vp: Viewport, slot: Slot, keepClear: Rect[]): Pt {
+  const home = layoutCallout(t, box, vp, slot).text;
+  if (vp.phone || keepClear.length === 0) return home;
+  const minX = vp.gutter;
+  const maxX = vp.w - vp.gutter - box.w;
+  const minY = vp.top;
+  const maxY = vp.h - vp.bottom - box.h;
+  const options: Pt[] = [home];
+  for (const r of keepClear) {
+    options.push({ x: r.x + r.w + CLEAR, y: home.y }, { x: home.x, y: r.y - CLEAR - box.h }, { x: home.x, y: r.y + r.h + CLEAR });
+  }
+  let best = home;
+  let bestScore = Infinity;
   for (const o of options) {
-    if (o.x < b.minX || o.x > b.maxX || o.y < b.minY || o.y > b.maxY) continue;
-    if (rects.some((r) => hits(o, box, r))) continue;
-    const d = Math.hypot(o.x - at.x, o.y - at.y);
-    if (d < bestD) [best, bestD] = [o, d];
+    if (o.x < minX - 0.5 || o.x > maxX + 0.5 || o.y < minY - 0.5 || o.y > maxY + 0.5) continue;
+    if (keepClear.some((r) => hits(o, box, r))) continue;
+    const corner = layoutCallout(t, box, vp, slot, o).corner;
+    const score = Math.hypot(o.x - home.x, o.y - home.y) + (keepClear.some((r) => crosses(t, corner, r)) ? 1e5 : 0);
+    if (score < bestScore) [best, bestScore] = [o, score];
   }
   return best;
 }

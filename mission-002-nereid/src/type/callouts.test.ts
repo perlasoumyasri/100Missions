@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildAt, buildStages, layoutCallout, MARK_R, type Slot } from "./callouts";
+import { buildAt, buildStages, layoutCallout, MARK_R, placeWords, type Slot } from "./callouts";
 
 const desk = { w: 1440, h: 900, gutter: 75, top: 90, bottom: 80, phone: false };
 const phone = { w: 390, h: 844, gutter: 20, top: 82, bottom: 88, phone: true };
@@ -23,17 +23,18 @@ describe("layoutCallout", () => {
     expect(p.origin).toBe(300);
   });
 
-  it("moves the words clear of the chapter's text, to the nearest clear spot", () => {
+  it("places the words clear of the chapter's text, and the leader too", () => {
     const heading = { x: 380, y: 300, w: 500, h: 160 };
-    const p = layoutCallout({ x: 0, y: 0 }, box, desk, { ...slot, side: -1, up: false, y: 0.36 }, [heading]);
-    // The slot put the words at (420, 324), on the heading; the nearest clear spot is just above it.
-    expect(p.text).toEqual({ x: 420, y: 202 });
-    expect(p.corner).toEqual({ x: 720, y: 202 });
-    // With no room above, the nearest clear spot is below it.
-    const r = layoutCallout({ x: 0, y: 0 }, box, desk, { ...slot, side: -1, up: false, y: 0.36 }, [{ ...heading, y: 150, h: 310 }]);
-    expect(r.text).toEqual({ x: 420, y: 478 });
-    const q = layoutCallout({ x: 0, y: 0 }, box, desk, slot, [{ x: 0, y: 600, w: 100, h: 100 }]);
-    expect(q.text).toEqual({ x: 720, y: 370 }); // already clear: unchanged
+    const low = { ...slot, side: -1 as const, up: false, y: 0.36 };
+    // The slot puts the words at (420, 324), on the heading; the nearest clear spot is just above it.
+    expect(placeWords({ x: 300, y: 100 }, box, desk, low, [heading])).toEqual({ x: 420, y: 202 });
+    // Already clear, with a clear leader: the slot stands.
+    expect(placeWords({ x: 100, y: 100 }, box, desk, slot, [{ x: 0, y: 600, w: 100, h: 100 }])).toEqual({ x: 720, y: 370 });
+    // Words clear, but the leader from a target below the heading would cross it: they move below it.
+    const p = placeWords({ x: 700, y: 520 }, box, desk, { ...slot, x: 0.6, y: 0.3, up: true }, [{ x: 380, y: 280, w: 400, h: 160 }]);
+    expect(p.y).toBeGreaterThanOrEqual(280 + 160);
+    // The words, once placed, are where layoutCallout draws them.
+    expect(layoutCallout({ x: 0, y: 0 }, box, desk, low, { x: 420, y: 202 }).text).toEqual({ x: 420, y: 202 });
   });
 
   it("stays inside the safe area", () => {
