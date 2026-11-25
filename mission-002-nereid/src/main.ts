@@ -6,9 +6,9 @@ import { ANOMALY, ANOMALY_DISTANCE, CHAPTERS, METRES_PER_UNIT, Story, type Story
 import { hexLinear } from "./ocean/tuning";
 import type { FrameInfo, FrameParams, OceanRenderer } from "./ocean/renderer";
 import { createSound, type CueId } from "./sound";
-import { buildAt, buildStages, CLOCK_PACE, layoutCallout, readTime, schedule, wordAt, type Line, type Slot } from "./type/callouts";
+import { buildAt, buildStages, layoutCallout, readSeconds, type Slot } from "./type/callouts";
 import { apply, split, type Mode, type Split } from "./type/kinetic";
-import { createConsole } from "./type/console";
+import { createStatuses } from "./type/status";
 
 const $ = <T extends Element = HTMLElement>(s: string) => document.querySelector<T>(s)!;
 const reducedQuery = matchMedia("(prefers-reduced-motion: reduce)");
@@ -39,10 +39,7 @@ interface Callout {
   slot: Slot;
   gate?: string;
   text: HTMLElement;
-  /** Its lines, which arrive one at a time; a sentence's words come up one by one (a reading comes up whole). */
-  lines: { el: HTMLElement; line: Line; words: HTMLElement[] }[];
-  sched: ReturnType<typeof schedule>;
-  /** When the scroll reached it (story time, s), or -1: from then its words come up at reading pace. */
+  /** When the scroll reached it (story time, s), or -1: from then it builds in time and its words come up whole. */
   since: number;
   /** Build progress 0..1 of the ring, leader and shelf, and the measured size of the words. */
   k: number;
@@ -61,34 +58,12 @@ interface Frame {
   callouts: Callout[];
 }
 const words = (el: Element) => (el.textContent ?? "").trim().split(/\s+/).length;
-/** Wraps each word of a plain sentence in a span, so the words can come up one by one. */
-const splitWords = (el: HTMLElement) => {
-  const parts = (el.textContent ?? "").trim().split(/\s+/);
-  el.textContent = "";
-  return parts.map((w, i) => {
-    const span = document.createElement("span");
-    span.className = "callout__word";
-    span.textContent = w;
-    if (i > 0) el.append(" ");
-    el.append(span);
-    return span;
-  });
-};
 const frames: Frame[] = [...document.querySelectorAll<HTMLElement>(".frame")].map((el) => ({
   el,
   len: Number(el.closest<HTMLElement>(".chapter")!.style.getPropertyValue("--len")),
   callouts: [...el.querySelectorAll<HTMLElement>(".callout")].map((c) => {
     const [a, b] = c.dataset.span!.split(",");
-    const lines = [...c.querySelectorAll<HTMLElement>(".callout__line")].map((l) => {
-      const data = l.classList.contains("callout__data");
-      return { el: l, line: { words: words(l), data }, words: data ? [] : splitWords(l) };
-    });
     return {
-      lines,
-      sched: schedule(
-        lines.map((l) => l.line),
-        CLOCK_PACE,
-      ),
       since: -1,
       el: c,
       at: c.dataset.at!,
@@ -404,7 +379,7 @@ const calloutViewport = () => {
   const h = innerHeight;
   const phone = w < 700;
   // The chapter gauge owns the right edge on wide screens; the masthead and fine print own top and bottom.
-  return { w: w - (w > 900 ? 130 : 0), h, gutter: Math.min(96, Math.max(20, w * 0.052)), top: phone ? 100 : 104, bottom: phone ? 100 : 76, phone }; // the console line sits under the masthead
+  return { w: w - (w > 900 ? 130 : 0), h, gutter: Math.min(96, Math.max(20, w * 0.052)), top: phone ? 72 : 86, bottom: phone ? 100 : 76, phone };
 };
 
 /**
@@ -419,30 +394,26 @@ function updateCallouts(f: Frame, lp: number, targets: Anchors["targets"], openi
   for (const c of f.callouts) {
     const t = targets[c.at as Target];
     const before = c.k;
-    let lines: number[];
+    let text: number;
     if (pinned) {
       const [start, end] = c.span;
       const span = end - (start ?? 0);
       const fold = clamp01((end - lp) / Math.min(CALLOUT_FOLD, span * 0.25));
-      // The scroll decides when a callout begins (the Opening's: its clock); from then its words come up
-      // at reading pace on their own, so they are seen arriving one by one however fast the visitor scrolls.
+      // The scroll decides when a callout begins (the Opening's: its clock); from then it builds in time
+      // and its words come up whole, so they can be read however fast the visitor scrolls.
       const gate = c.gate !== "anomaly" || story.anomalyFound;
       if (start !== null) {
         if (lp >= start && lp < end && gate && t.visible) {
           if (c.since < 0) c.since = story.time;
         } else if (lp < start) c.since = -1;
       }
-      const b = buildAt(
-        start === null ? openingT - OPENING.callout : c.since < 0 ? 0 : story.time - c.since,
-        c.sched,
-        CLOCK_PACE,
-      );
+      const b = buildAt(start === null ? openingT - OPENING.callout : c.since < 0 ? 0 : story.time - c.since);
       const on = gate && (t.visible || c.placed) ? fold : 0;
       c.k = Math.min(b.structure, on);
-      lines = b.lines.map((l) => Math.min(l, on));
+      text = Math.min(b.text, on);
     } else {
       c.k = lp > -0.1 && lp < 1 ? 1 : 0;
-      lines = c.lines.map(() => c.k);
+      text = c.k;
     }
     if (c.k === 0) c.placed = false;
     if (before === 0 && c.k === 0) continue;
@@ -468,20 +439,12 @@ function updateCallouts(f: Frame, lp: number, targets: Anchors["targets"], openi
     setVar(c.el, "--mark", st.mark.toFixed(3));
     setVar(c.el, "--leg", st.leg.toFixed(3));
     setVar(c.el, "--shelf", st.shelf.toFixed(3));
-    // The plate behind the words comes up with the first line; each line then arrives on its own, a
-    // sentence word by word, a reading whole.
-    setVar(c.el, "--text", Math.min(1, (lines[0] ?? 0) * 4).toFixed(3));
-    c.lines.forEach((l, i) => {
-      const t = lines[i]!;
-      if (!l.words.length) return setVar(l.el, "--l", (t * t * (3 - 2 * t)).toFixed(3));
-      setVar(l.el, "--l", t > 0 ? "1" : "0");
-      l.words.forEach((w, j) => setVar(w, "--w", wordAt(t, j, l.words.length).toFixed(3)));
-    });
+    setVar(c.el, "--text", text.toFixed(3)); // all the words, and the plate behind them, at once
   }
 }
 
-/** The probe's console (under the masthead): the instruments' lines type out there, with a tick per letter. */
-const probeConsole = createConsole($("#console"), () => sound.tick());
+/** The instruments' status lines, one under each heading: they type out once reached, with a soft tick. */
+const statuses = createStatuses([...document.querySelectorAll<HTMLElement>(".status[data-at]")], () => sound.tick());
 
 function overlay(p: number, depthM: number, a: Anchors): void {
   const reduced = story.reducedMotion;
@@ -555,7 +518,7 @@ function overlay(p: number, depthM: number, a: Anchors): void {
     }
   });
 
-  probeConsole.update(p, story.time, reduced);
+  statuses.update(p, story.time, reduced, story.speed);
 
   // Gauge, depth and readouts.
   const current = Math.min(CHAPTERS - 1, Math.floor(p));
@@ -602,9 +565,9 @@ const VH_PER_SECOND = 8;
  */
 const OPENING = (() => {
   const question = [TITLE[1] + 0.6, TITLE[1] + 1.6] as const;
-  const callout = question[1] + readTime(words($(".tagline")), CLOCK_PACE);
+  const callout = question[1] + readSeconds(words($(".tagline")));
   const c = frames[0]!.callouts[0]!;
-  const begin = callout + c.sched.end + CLOCK_PACE.gap;
+  const begin = callout + 1 + readSeconds(words(c.text));
   return { question, callout, begin: [begin, begin + 0.7] as const };
 })();
 const advanceIntro = (dt: number) => {

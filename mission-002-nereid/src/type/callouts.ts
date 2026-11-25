@@ -98,58 +98,22 @@ const step = (t: number) => {
   return c * c * (3 - 2 * c);
 };
 
-/** How a callout's structure builds from k = 0 to 1: ring, then leader, then shelf. The words follow, line by line. */
+/** How a callout's structure builds from k = 0 to 1: ring, then leader, then shelf. */
 export function buildStages(k: number) {
   const s = (a: number, b: number) => step((k - a) / (b - a));
   return { mark: s(0, 0.3), leg: s(0.15, 0.75), shelf: s(0.55, 1) };
 }
 
 /**
- * Reading pace. People read one line at a time, word by word, so a callout's words come up one after
- * another at reading speed (`perWord`), and the next line waits a pause (`gap`) after the last word.
- * Readings (data lines) come up whole, in a short beat. In seconds: the scroll decides when a callout
- * begins, and from then it runs at this pace, so the words are seen arriving however fast one scrolls.
+ * Once the scroll reaches a callout, it builds in time and comes up whole: ring, leader and shelf in half
+ * a second, then all its words at once, and it stays until its chapter hands over. (Words that came up
+ * one by one were still arriving when visitors scrolled on, so they never got to read them.)
  */
-export interface Pace {
-  structure: number;
-  line: number;
-  gap: number;
-  perWord: number;
-}
-export const CLOCK_PACE: Pace = { structure: 0.6, line: 0.3, gap: 1.0, perWord: 0.26 }; // seconds
-
-export interface Line {
-  words: number;
-  data: boolean;
+export const STRUCTURE_S = 0.5;
+export const TEXT_S = 0.5;
+export function buildAt(x: number) {
+  return { structure: Math.min(1, Math.max(0, x / STRUCTURE_S)), text: step((x - STRUCTURE_S * 0.7) / TEXT_S) };
 }
 
-/** How long a line takes to come up: word by word, or a short beat for a reading. */
-export const revealTime = (l: Line, pace: Pace) => pace.line + (l.data ? 4 : l.words) * pace.perWord;
-
-/** Time to read something that appears all at once (a heading or question) before the next thing comes. */
-export const readTime = (words: number, pace: Pace) => pace.gap + words * pace.perWord;
-
-/** Each line's window [from, to], measured from the callout's start, and when the last line is whole. */
-export function schedule(lines: readonly Line[], pace: Pace) {
-  let t = pace.structure;
-  const windows: [number, number][] = [];
-  lines.forEach((l, i) => {
-    const r = revealTime(l, pace);
-    windows.push([t, t + r]);
-    if (i < lines.length - 1) t += r + pace.gap;
-    else t += r;
-  });
-  return { windows, end: t };
-}
-
-/** The callout `x` units after its start: structure progress, and each line's progress (linear, 0..1). */
-export function buildAt(x: number, sched: ReturnType<typeof schedule>, pace: Pace) {
-  const c = (t: number) => Math.min(1, Math.max(0, t));
-  return { structure: c(x / pace.structure), lines: sched.windows.map(([a, b]) => c((x - a) / (b - a))) };
-}
-
-/**
- * Word `j` of `m` at line progress `t`: each word fades up in place over about one and a half words'
- * time, the next starting before the last has settled, so the line reads like it is being spoken.
- */
-export const wordAt = (t: number, j: number, m: number) => step((t * (m + 0.5) - j) / 1.5);
+/** Seconds to read `words` words that appeared at once, before the next thing comes. */
+export const readSeconds = (words: number) => 1 + words * 0.26;

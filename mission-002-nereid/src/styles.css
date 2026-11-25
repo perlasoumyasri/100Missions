@@ -371,6 +371,7 @@ em {
 
 /* Every element in a frame fades with the frame's own envelope (set from JS as --in / --out). */
 .frame .narrative,
+.frame .status,
 .frame .annot,
 .frame .index,
 .frame .kicker,
@@ -980,24 +981,14 @@ em {
   bottom: auto;
 }
 
-/* The words come up in place once the leader has reached the shelf, one line at a time (--l, from the
-   reading pace in type/callouts.ts): no wipe, no movement. */
+/* The words come up in place, all at once, once the leader has reached the shelf: no wipe, no movement. */
 .callout__line {
   display: block;
   text-wrap: balance;
-  opacity: var(--l, 0);
+  opacity: var(--text, 0);
 }
 
-/* A sentence's words come up one by one, in place, as if read aloud (--w from main.ts): each arrives in
-   the callout's colour and settles to white. */
-.callout__word {
-  opacity: var(--w, 0);
-  color: color-mix(in oklab, var(--tone) calc((1 - var(--w, 0)) * 100%), var(--text));
-}
 
-[data-callouts="static"] .callout__word {
-  opacity: 1;
-}
 
 .callout__line + .callout__line {
   margin-top: 0.3em;
@@ -1049,49 +1040,33 @@ em {
   opacity: 1;
 }
 
-/* ───── The probe's console: one line under the masthead, on a plate so it reads over any scene ───── */
-.console {
+/* ───── Status lines: the probe's instruments, one under each heading (type/status.ts) ───── */
+.status {
   --cursor: rgb(139 227 245 / 0.85);
-  position: fixed;
-  top: calc(var(--top) + 36px);
-  left: 50%;
-  z-index: 5;
-  transform: translateX(-50%);
-  max-width: calc(100vw - 2 * var(--gutter));
-  margin: 0;
-  padding: 7px 14px;
-  list-style: none;
-  border: 1px solid rgb(139 227 245 / 0.28);
-  border-radius: 4px;
-  background: rgb(3 9 14 / 0.72);
+  margin: 14px 0 0;
+  max-width: 46ch;
   font-family: var(--mono);
-  font-size: clamp(0.75rem, 0.7rem + 0.25vw, 0.9375rem);
-  line-height: 1.3;
-  letter-spacing: 0.06em;
+  font-size: var(--fs-essential);
+  line-height: 1.4;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  white-space: nowrap;
   color: var(--ice);
-  pointer-events: none;
+  text-shadow:
+    0 0 14px rgb(3 9 14 / 0.95),
+    0 0 4px rgb(3 9 14 / 0.9);
 }
-.console[hidden] {
-  display: none;
-}
-.console li::before {
+.status::before {
   content: "› ";
   color: var(--muted);
 }
+/* Waiting to be reached: its space is kept, so nothing below it moves when it arrives. */
+.status.is-off {
+  visibility: hidden;
+}
 /* Teleprinter: a letter lands white-hot (--f = 1) and cools to cyan over the next two. */
-.console__ch {
+.status__ch {
   color: color-mix(in oklab, #fff calc(var(--f, 0) * 100%), var(--ice));
   text-shadow: 0 0 calc(var(--f, 0) * 10px) rgb(139 227 245 / 0.9);
-}
-@media (max-width: 699px) {
-  .console {
-    top: calc(var(--top) + 30px);
-    padding: 5px 10px;
-    font-size: 0.6875rem;
-    letter-spacing: 0.02em;
-  }
 }
 
 /* Shown once if the visitor scrolls without a click: browsers start audio only on a click, tap or key. */

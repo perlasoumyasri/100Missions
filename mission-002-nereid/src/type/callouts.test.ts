@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildAt, buildStages, layoutCallout, MARK_R, schedule, wordAt, type Slot } from "./callouts";
+import { buildAt, buildStages, layoutCallout, MARK_R, type Slot } from "./callouts";
 
 const desk = { w: 1440, h: 900, gutter: 75, top: 90, bottom: 80, phone: false };
 const phone = { w: 390, h: 844, gutter: 20, top: 82, bottom: 88, phone: true };
@@ -58,48 +58,11 @@ describe("buildStages", () => {
   });
 });
 
-describe("schedule", () => {
-  const pace = { structure: 6, line: 3, gap: 10, perWord: 1 };
-  it("starts the first line once the structure is built, and takes longer for more words", () => {
-    expect(schedule([{ words: 5, data: false }], pace)).toEqual({ windows: [[6, 14]], end: 14 });
-  });
-  it("pauses after each line; a reading comes up in a short beat", () => {
-    const s = schedule(
-      [
-        { words: 6, data: true },
-        { words: 10, data: false },
-      ],
-      pace,
-    );
-    expect(s.windows).toEqual([
-      [6, 13], // reading: 3 + 4
-      [23, 36], // after a 10 gap: 3 + 10 words
-    ]);
-    expect(s.end).toBe(36);
-  });
-  it("never lets two lines form at once", () => {
-    const s = schedule(Array.from({ length: 4 }, () => ({ words: 3, data: false })), pace);
-    for (let i = 1; i < s.windows.length; i++) expect(s.windows[i]![0]).toBeGreaterThan(s.windows[i - 1]![1]);
-  });
-});
-
-describe("buildAt and wordAt", () => {
-  const pace = { structure: 6, line: 3, gap: 10, perWord: 1 };
-  const s = schedule(
-    [
-      { words: 2, data: false },
-      { words: 2, data: false },
-    ],
-    pace,
-  );
-  it("shows the structure first, then line one, then line two", () => {
-    expect(buildAt(3, s, pace)).toEqual({ structure: 0.5, lines: [0, 0] });
-    expect(buildAt(11, s, pace).lines).toEqual([1, 0]);
-    expect(buildAt(100, s, pace).lines).toEqual([1, 1]);
-  });
-  it("brings the words up in order, all whole at the end of the line", () => {
-    expect(wordAt(0, 0, 4)).toBe(0);
-    expect(wordAt(0.3, 0, 4)).toBeGreaterThan(wordAt(0.3, 2, 4));
-    for (let j = 0; j < 4; j++) expect(wordAt(1, j, 4)).toBe(1);
+describe("buildAt", () => {
+  it("builds the structure first, then all the words at once, within a second", () => {
+    expect(buildAt(0)).toEqual({ structure: 0, text: 0 });
+    expect(buildAt(0.25).text).toBe(0);
+    expect(buildAt(0.25).structure).toBe(0.5);
+    expect(buildAt(1)).toEqual({ structure: 1, text: 1 });
   });
 });

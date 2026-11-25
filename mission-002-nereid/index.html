@@ -39,17 +39,9 @@
       <p class="gauge__depth" aria-hidden="true"><span id="depth">0</span> m <span class="gauge__sim">sim.</span></p>
     </nav>
 
-    <!-- The probe's console: one line under the masthead where the instruments report. Each message types
-         out when the story reaches its position (data-at, in chapters) and stays until the next one. -->
+    <!-- Shown once if the visitor scrolls without a click: browsers start audio only on a click, tap or key. -->
     <p class="sound-hint" id="sound-hint" role="status" hidden>Click or tap anywhere to turn on sound</p>
-    <ol class="console" id="console" role="log" aria-label="Probe log" hidden>
-      <li data-at="1.57">Landing site identified. Preparing probe.</li>
-      <li data-at="2.69">Ice thinning. Liquid water detected below.</li>
-      <li data-at="3.02">Ice breached. Probe in liquid water.</li>
-      <li data-at="4.36">Thermal anomaly · <span data-anomaly-range>4.4 km</span> ahead · simulated</li>
-      <li data-at="5.74">Collecting water samples. Analysing chemistry.</li>
-      <li data-at="6.47">Transmitting to Earth · delay 43&nbsp;min · simulated</li>
-    </ol>
+
 
     <main>
       <!-- Each chapter answers one question and raises the next. Status lines and actions carry a
@@ -75,6 +67,7 @@
         <div class="frame frame--2" data-frame="1">
           <p class="index"><span>02</span> Arrival</p>
           <h2 class="headline" id="t-2" data-kinetic="fade">From here, it looks <em>lifeless.</em></h2>
+          <p class="status" data-at="1.57">Landing site identified. Preparing probe.</p>
           <div class="callout callout--gold" data-at="ice" data-span="0.24,0.97" data-slot="0.56,0.62,1,0,0.78">
             <span class="callout__mark" aria-hidden="true"></span><span class="callout__leg" aria-hidden="true"></span>
             <p class="callout__text"><span class="callout__line">Jupiter's pull bends and breaks this ice.</span><span class="callout__line">Some of these cracks may carry material up from below.</span></p>
@@ -86,6 +79,7 @@
         <div class="frame frame--3" data-frame="2">
           <p class="index"><span>03</span> The Descent</p>
           <h2 class="headline" id="t-3" data-kinetic="fade">How far down does <em>the ice go?</em></h2>
+          <p class="status" data-at="2.69">Ice thinning. Liquid water detected below.</p>
           <div class="callout callout--ice" data-at="lamp" data-span="0.42,0.97" data-slot="0.56,0.42,1,1,0.66">
             <span class="callout__mark" aria-hidden="true"></span><span class="callout__leg" aria-hidden="true"></span>
             <p class="callout__text"><span class="callout__line">Our probe melts its way down.</span><span class="callout__line">Above us, the sunlight is already gone.</span></p>
@@ -98,6 +92,7 @@
         <div class="frame frame--4" data-frame="3">
           <p class="index"><span>04</span> First Contact</p>
           <h2 class="headline" id="t-4" data-kinetic="fade">There is an ocean <em>down here.</em></h2>
+          <p class="status" data-at="3.02">Ice breached. Probe in liquid water.</p>
           <div class="callout callout--ice" data-at="water" data-span="0.31,0.97" data-slot="0.4,0.25,-1,0,0.31">
             <span class="callout__mark" aria-hidden="true"></span><span class="callout__leg" aria-hidden="true"></span>
             <p class="callout__text"><span class="callout__line">It may hold twice the water of all Earth's oceans.</span><span class="callout__line">And we are only at the top of it.</span></p>
@@ -113,6 +108,7 @@
         <div class="frame frame--5" data-frame="4">
           <p class="index"><span>05</span> The Anomaly</p>
           <h2 class="headline" id="t-5" data-kinetic="fade">We send sound <em>into the dark.</em></h2>
+          <p class="status" data-at="4.36">Thermal anomaly · <span data-anomaly-range>4.4 km</span> ahead · simulated</p>
           <div class="callout callout--warm" data-at="anomaly" data-span="0.38,0.97" data-slot="0.475,0.255,1,0,0.42" data-gate="anomaly">
             <span class="callout__mark" aria-hidden="true"></span><span class="callout__leg" aria-hidden="true"></span>
             <p class="callout__text"><span class="callout__line callout__data">Thermal anomaly · ΔT&nbsp;+3.1&nbsp;K · <span data-anomaly-range>4.4 km</span> · simulated</span><span class="callout__line">In water near freezing, one region is unusually warm.</span><span class="callout__line">Something down there is giving off heat.</span></p>
@@ -128,6 +124,7 @@
         <div class="frame frame--6" data-frame="5">
           <p class="index"><span>06</span> The Discovery</p>
           <h2 class="headline" id="t-6" data-kinetic="fade">We've seen this before. <em>On Earth.</em></h2>
+          <p class="status" data-at="5.74">Collecting water samples. Analysing chemistry.</p>
           <div class="callout callout--warm" data-at="vent" data-span="0.42,0.97" data-slot="0.58,0.36,1,1,0.56">
             <span class="callout__mark" aria-hidden="true"></span><span class="callout__leg" aria-hidden="true"></span>
             <p class="callout__text"><span class="callout__line callout__data">Hydrothermal vent · T&nbsp;+11&nbsp;°C · chemical gradient · simulated</span><span class="callout__line">Around vents like these on Earth, whole ecosystems live in darkness, fed by chemistry, not sunlight.</span></p>
@@ -139,6 +136,7 @@
         <div class="frame frame--7" data-frame="6">
           <p class="index"><span>07</span> The Transmission</p>
           <h2 class="question" id="t-7" data-kinetic="fade">Water. Heat. Chemistry. <em>Life?</em></h2>
+          <p class="status" data-at="6.47">Transmitting to Earth · delay 43&nbsp;min · simulated</p>
           <div class="callout callout--gold" data-at="earth" data-span="0.62,0.97" data-slot="0.44,0.19,-1,0,0.27">
             <span class="callout__mark" aria-hidden="true"></span><span class="callout__leg" aria-hidden="true"></span>
             <p class="callout__text"><span class="callout__line">The first life we find beyond Earth may be too small to see without a microscope.</span></p>
