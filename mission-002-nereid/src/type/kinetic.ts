@@ -103,7 +103,10 @@ export function apply(mode: Mode, s: Split, c: Context): void {
       // letter is solid, staggered across the word. Once a letter is whole its mask is removed.
       put(s.el, `opacity:${(1 - c.out).toFixed(3)};${blur(c.out * 6)}`);
       s.chars.forEach((ch, i) => {
-        const t = clamp01(c.k * (1 + n * 0.12) - i * 0.12 - s.seeds[i]! * 0.08);
+        // Staggered so the last letter is whole by 85 % of the build (the D's serif used to arrive last,
+        // at the very end); the finished name then holds.
+        const stagger = n > 1 ? 0.3 / (n - 1) : 0;
+        const t = clamp01((c.k - i * stagger - s.seeds[i]! * 0.03) / 0.52);
         if (t >= 1) return put(ch, "");
         const fill = (t * t * (3 - 2 * t) * 100).toFixed(1);
         const m = `linear-gradient(to bottom,#000 ${fill}%,transparent ${fill}%)`;

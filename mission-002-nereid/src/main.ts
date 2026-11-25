@@ -473,8 +473,15 @@ function overlay(p: number, depthM: number, a: Anchors): void {
       // The journey line over Jupiter, then the name forming as Europa arrives (the title clock), then,
       // on the opening clock, the label, the question, the callout line by line, and the first action.
       const it = reduced ? 99 : introT;
-      openingT = reduced ? 99 : Math.max(introT, TITLE[1] + (lp * f.len) / VH_PER_SECOND);
-      setVar(f.el, "--journey", (smooth(0.8, 1.8, it) * (1 - smooth(3.6, 4.6, it)) * (1 - smooth(0.05, 0.3, lp))).toFixed(3));
+      // Scrolling moves the opening on only once the name has formed, so nothing after it (the label, the
+      // question, the callout) can arrive over the journey line or the forming name.
+      if (introT >= TITLE[1] && lpAtTitle === null) lpAtTitle = lp;
+      openingT = reduced
+        ? 99
+        : lpAtTitle === null
+          ? introT
+          : Math.max(introT, TITLE[1] + (Math.max(0, lp - lpAtTitle) * f.len) / VH_PER_SECOND);
+      setVar(f.el, "--journey", (smooth(0.3, 1.0, it) * (1 - smooth(2.2, 2.8, it)) * (1 - smooth(0.05, 0.3, lp))).toFixed(3));
       setVar(f.el, "--act", smooth(OPENING.begin[0], OPENING.begin[1], openingT).toFixed(3));
       k = smooth(TITLE[0], TITLE[1], it);
       inEnv = smooth(TITLE[1], TITLE[1] + 0.5, openingT);
@@ -551,13 +558,15 @@ let elapsed = 0;
  * once the visitor scrolls, so nobody is held in an intro they want to leave.
  */
 let introT = 0;
-const INTRO_TRAVEL: readonly [number, number] = [0.6, 7.4];
+const INTRO_TRAVEL: readonly [number, number] = [0.3, 5.6];
 const introProgress = () => (story.reducedMotion ? 1 : smooth(INTRO_TRAVEL[0], INTRO_TRAVEL[1], introT));
 let hurried = false;
 addEventListener("keydown", () => (hurried = true), { once: true });
 addEventListener("focusin", () => (hurried = true), { once: true });
 /** NEREID forms over these seconds of the intro clock: slow, so each slice of light can be watched. */
-const TITLE: readonly [number, number] = [4.6, 8.4];
+const TITLE: readonly [number, number] = [2.8, 6.4];
+/** The Opening's scroll position when the name finished forming (scroll moves the opening on from there). */
+let lpAtTitle: number | null = null;
 /** Scrolling moves the opening clock on: one second of it for every 6vh of scroll. */
 const VH_PER_SECOND = 8;
 /**
