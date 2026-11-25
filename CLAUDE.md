@@ -7,7 +7,7 @@ This file holds only what is shared. **It sets no aesthetic, visual style or tec
 ## Layout
 
 - `mission-NNN-<slug>/`: one independent app. Its `CLAUDE.md` (stack, commands, decisions) loads when you work there. `brief.md` and `art-direction.md` are read at the start of mission work. `references/` holds reference material.
-- `.claude/skills/`: shared craft skills, loaded only when relevant: `design-principles`, `art-direction`, `animation`, `library-discovery`, `visual-quality`, `ship-mission`.
+- `.claude/skills/`: shared craft skills, loaded only when relevant: `design-principles`, `art-direction`, `animation`, `library-discovery`, `visual-quality`, `ship-mission`, `openscreen-demo` (demo videos via the OpenScreen app, connected to Claude Code as the `openscreen` MCP server).
 - `learnings.md`: reusable discoveries from past missions. Search it during discovery, and add to it when a mission ships.
 - `_template/`: starting files for a mission. `hub/`, `missions.json`, `scripts/`: the shared site and build.
 - `site/mission-NNN/`: each shipped mission's built output, made once by `npm run build:mission -- N` and committed. Vercel only copies these; it never builds missions. Don't read or edit files in `site/`.

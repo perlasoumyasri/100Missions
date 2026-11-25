@@ -16,6 +16,7 @@ Rules and current facts for this mission. They add to the root `CLAUDE.md` and o
 
 - **Phase:** Shipped 2026-11-24, https://100-missions.vercel.app/mission-002/ <!-- Brief → Art direction → Discovery → Build → Quality pass → Shipped -->
 - **After shipping:** any code change needs `npm run build:mission -- 2` from the repo root, and the rebuilt `site/mission-002/` committed. The sound defaults were picked blind from measurements; the user may still swap takes at `/audition/` (dev only, git-ignored; regenerate on the ElevenLabs flow "NEREID sound candidates", `i9JbN71N8g0txDbtm4Rs`).
+- **Next (asked 2026-11-25, to do right after a context compaction):** make the NEREID title's slice animation smoother at the end. The user: "it's elegant already, but at the last the pace isn't good". Cause found: the title's progress `k = smooth(TITLE[0], TITLE[1], introT)` (main.ts, frame 0) is an ease-in-out, so it crawls near the end, and the staggered last letters (I, D) form inside that slow tail (`slices` in type/kinetic.ts: `t = clamp01((k - i*stagger - seed*0.03) / 0.52)`, stagger `0.3/(n-1)`). Planned fix: drive the letters from linear title time, so each letter forms over the same duration at an even cadence, keeping the per-letter `t*t*(3-2t)` ease for the softness; keep the 4.6–8.4 s window and the Jupiter timing (the user rejected a shorter intro). Then check the letters' finish times are evenly spaced, rebuild, commit, push and confirm live (memory: push fixes to shipped missions).
 
 Only work on the phase the user asks for.
 

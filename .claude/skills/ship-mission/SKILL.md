@@ -16,6 +16,7 @@ Only ship when the user asks. Run the `visual-quality` review first.
 5. **Mission `CLAUDE.md`:** set the status to shipped with the date and live link.
 6. **Build this mission only:** `npm run build:mission -- <number>` writes it to `site/mission-NNN/`. Then `npm run build` (assembles `dist/` in seconds) and spot-check with `npm run preview`. Rebuild with `build:mission` whenever a shipped mission's code changes.
 7. **Commit** the mission folder **and** `site/mission-NNN/`, with the message style `Mission NNN: <what changed>`. Push only when the user asks, as `perlasoumyasri` (see Git in the root CLAUDE.md).
+8. **Demo video for the posts** (when the user asks): use the `openscreen-demo` skill, recording the live `/mission-NNN/` page. The audience is LinkedIn and X, so make a launch demo with callouts (they autoplay muted): 4:5 for LinkedIn, 16:9 for X. Export to `~/Movies/100 Missions/mission-NNN/`. Never commit videos, and never post anything. Hand the files and a draft post to the user.
 
 ## Build contract
 
