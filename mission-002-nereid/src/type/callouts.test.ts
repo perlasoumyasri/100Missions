@@ -23,6 +23,19 @@ describe("layoutCallout", () => {
     expect(p.origin).toBe(300);
   });
 
+  it("moves the words clear of the chapter's text, to the nearest clear spot", () => {
+    const heading = { x: 380, y: 300, w: 500, h: 160 };
+    const p = layoutCallout({ x: 0, y: 0 }, box, desk, { ...slot, side: -1, up: false, y: 0.36 }, [heading]);
+    // The slot put the words at (420, 324), on the heading; the nearest clear spot is just above it.
+    expect(p.text).toEqual({ x: 420, y: 202 });
+    expect(p.corner).toEqual({ x: 720, y: 202 });
+    // With no room above, the nearest clear spot is below it.
+    const r = layoutCallout({ x: 0, y: 0 }, box, desk, { ...slot, side: -1, up: false, y: 0.36 }, [{ ...heading, y: 150, h: 310 }]);
+    expect(r.text).toEqual({ x: 420, y: 478 });
+    const q = layoutCallout({ x: 0, y: 0 }, box, desk, slot, [{ x: 0, y: 600, w: 100, h: 100 }]);
+    expect(q.text).toEqual({ x: 720, y: 370 }); // already clear: unchanged
+  });
+
   it("stays inside the safe area", () => {
     for (const s of [{ ...slot, x: 0, y: 0 }, { ...slot, x: 1, y: 1, up: false }]) {
       const p = layoutCallout({ x: 0, y: 0 }, box, desk, s);

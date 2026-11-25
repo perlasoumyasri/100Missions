@@ -34,6 +34,17 @@ export interface Placement {
   leg: { x: number; y: number; length: number; angle: number };
 }
 
+/** A rectangle on screen, px (the chapter's own text: heading, label, status line, narrative). */
+export interface Rect {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+}
+
+/** Space kept between a callout's words and the chapter's text, px. */
+export const CLEAR = 18;
+
 /** Radius of the target ring, px: the leader starts at its edge. */
 export const MARK_R = 5;
 
@@ -55,7 +66,7 @@ const clamp = (x: number, lo: number, hi: number) => Math.min(Math.max(x, lo), M
  * Place a callout. The words sit in a fixed slot (clamped into the safe area); the leader runs from the
  * target to the shelf. On phones the leader meets the top of the words under the target's x.
  */
-export function layoutCallout(t: Pt, box: { w: number; h: number }, vp: Viewport, slot: Slot): Placement {
+export function layoutCallout(t: Pt, box: { w: number; h: number }, vp: Viewport, slot: Slot, keepClear: Rect[] = []): Placement {
   const minX = vp.gutter;
   const maxX = vp.w - vp.gutter - box.w;
   const minY = vp.top;
@@ -75,6 +86,7 @@ export function layoutCallout(t: Pt, box: { w: number; h: number }, vp: Viewport
       y: clamp(slot.up ? cy - box.h : cy, minY, maxY),
     };
     shelfOnTop = !slot.up;
+    text = clearOf(text, box, keepClear, { minX, maxX, minY, maxY });
     corner = { x: slot.side > 0 ? text.x : text.x + box.w, y: shelfOnTop ? text.y : text.y + box.h };
   }
 
@@ -91,6 +103,31 @@ export function layoutCallout(t: Pt, box: { w: number; h: number }, vp: Viewport
     origin: corner.x - text.x,
     leg: { x: t.x + ux * MARK_R, y: t.y + uy * MARK_R, length: Math.max(0, dist - MARK_R), angle },
   };
+}
+
+const hits = (a: Pt, box: { w: number; h: number }, r: Rect) =>
+  a.x < r.x + r.w + CLEAR && a.x + box.w > r.x - CLEAR && a.y < r.y + r.h + CLEAR && a.y + box.h > r.y - CLEAR;
+
+/**
+ * On a wide but short window a slot can land on the chapter's heading. Then the words move to the nearest
+ * spot (right of, above or below a piece of the chapter's text) that is clear of all of it and inside the
+ * safe area. The rectangles are fixed for a layout, so the words still never move while they show.
+ */
+function clearOf(at: Pt, box: { w: number; h: number }, rects: Rect[], b: { minX: number; maxX: number; minY: number; maxY: number }): Pt {
+  if (!rects.some((r) => hits(at, box, r))) return at;
+  const options: Pt[] = [];
+  for (const r of rects) {
+    options.push({ x: r.x + r.w + CLEAR, y: at.y }, { x: at.x, y: r.y - CLEAR - box.h }, { x: at.x, y: r.y + r.h + CLEAR });
+  }
+  let best = at;
+  let bestD = Infinity;
+  for (const o of options) {
+    if (o.x < b.minX || o.x > b.maxX || o.y < b.minY || o.y > b.maxY) continue;
+    if (rects.some((r) => hits(o, box, r))) continue;
+    const d = Math.hypot(o.x - at.x, o.y - at.y);
+    if (d < bestD) [best, bestD] = [o, d];
+  }
+  return best;
 }
 
 const step = (t: number) => {

@@ -6,7 +6,7 @@ import { ANOMALY, ANOMALY_DISTANCE, CHAPTERS, METRES_PER_UNIT, Story, type Story
 import { hexLinear } from "./ocean/tuning";
 import type { FrameInfo, FrameParams, OceanRenderer } from "./ocean/renderer";
 import { createSound, type CueId } from "./sound";
-import { buildAt, buildStages, layoutCallout, readSeconds, type Slot } from "./type/callouts";
+import { buildAt, buildStages, layoutCallout, readSeconds, type Rect, type Slot } from "./type/callouts";
 import { apply, split, type Mode, type Split } from "./type/kinetic";
 import { createStatuses } from "./type/status";
 
@@ -56,6 +56,8 @@ interface Frame {
   /** Plain elements (actions, asides) that show only inside their window. */
   timed: { el: HTMLElement; win: Window }[];
   callouts: Callout[];
+  /** The chapter's own text on screen (measured), which its callouts keep clear of. */
+  text: Rect[];
 }
 const words = (el: Element) => (el.textContent ?? "").trim().split(/\s+/).length;
 const frames: Frame[] = [...document.querySelectorAll<HTMLElement>(".frame")].map((el) => ({
@@ -84,7 +86,10 @@ const frames: Frame[] = [...document.querySelectorAll<HTMLElement>(".frame")].ma
     return { s: split(k, mode), mode, win: parseWindow(k) };
   }),
   timed: [...el.querySelectorAll<HTMLElement>("[data-window]:not([data-kinetic])")].map((t) => ({ el: t, win: parseWindow(t)! })),
+  text: [],
 }));
+/** The chapter text a callout keeps clear of: headings, labels, status lines and narrative lines. */
+const CHAPTER_TEXT = ".index, .kicker, .title, .headline, .question, .tagline, .status, .narrative";
 const anomalyKm = ((ANOMALY_DISTANCE * METRES_PER_UNIT) / 1000).toFixed(1);
 const TITLES = ["The Mystery", "Arrival", "The Descent", "First Contact", "The Anomaly", "The Discovery", "The Transmission"];
 
@@ -139,6 +144,10 @@ const measure = () => {
   heights = sections.map((el) => el.offsetHeight || innerHeight);
   gaugeH = gaugeList.clientHeight;
   for (const f of frames) {
+    f.text = [...f.el.querySelectorAll<HTMLElement>(CHAPTER_TEXT)].map((e) => {
+      const r = e.getBoundingClientRect();
+      return { x: r.left, y: r.top, w: r.width, h: r.height };
+    });
     for (const c of f.callouts) {
       c.w = c.text.offsetWidth;
       c.h = c.text.offsetHeight;
@@ -420,7 +429,9 @@ function updateCallouts(f: Frame, lp: number, targets: Anchors["targets"], openi
     if (c.el.classList.contains("is-on") !== c.k > 0) c.el.classList.toggle("is-on", c.k > 0);
     if (pinned && t.visible) {
       c.placed = true;
-      const pl = layoutCallout(t, c, vp, c.slot);
+      // Clear of its own chapter's text and, while it carries over, of the next chapter's too.
+      const next = c.span[1] > 1 ? (frames[frames.indexOf(f) + 1]?.text ?? []) : [];
+      const pl = layoutCallout(t, c, vp, c.slot, [...f.text, ...next]);
       const px = (v: number) => `${v.toFixed(1)}px`;
       setVar(c.el, "--x", px(t.x));
       setVar(c.el, "--y", px(t.y));
