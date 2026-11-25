@@ -231,6 +231,7 @@ export function createSound() {
   let ctx: AudioContext | null = null;
   let engine: Engine | null = null;
   let enabled = false;
+  let risen = false;
 
   document.addEventListener("visibilitychange", () => {
     if (!ctx || !enabled) return;
@@ -245,17 +246,18 @@ export function createSound() {
     /** Must run inside a user gesture (click, tap or key press). */
     async enable(confirm = false): Promise<boolean> {
       try {
-        const first = !ctx;
         if (!ctx) {
           ctx = new AudioContext();
           engine = buildEngine(ctx);
         }
+        // Where the browser still needs a gesture, this waits for one (or fails); a later call succeeds.
         await ctx.resume();
         enabled = ctx.state === "running";
         if (enabled) {
-          // The first time, the beds grow out of near-silence over 6 s; turning sound back on later is quicker.
-          engine!.fadeTo(1, first ? 0.05 : 1.5);
-          if (first) engine!.rise(6);
+          // The first time it runs, the beds grow out of near-silence over 6 s; turning sound back on later is quicker.
+          engine!.fadeTo(1, risen ? 1.5 : 0.05);
+          if (!risen) engine!.rise(6);
+          risen = true;
           if (confirm) engine!.playCue("ui-confirm");
         }
       } catch {
